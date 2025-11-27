@@ -8,6 +8,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 // import Navbar from '@/components/Navbar';
 
 import Home from '@/pages/Home';
+import DoctorsIndex from '@/pages/DoctorsIndex';
 
 export default function App() {
 
@@ -18,6 +19,7 @@ export default function App() {
           <AppSidebar />
           <Routes>
             <Route path='/' element={<Home />} />
+            <Route path='/doctors' element={<DoctorsIndex />} />
           </Routes>
         </SidebarProvider>
       </Router>

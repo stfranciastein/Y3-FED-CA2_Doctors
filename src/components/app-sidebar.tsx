@@ -1,4 +1,5 @@
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Link } from "react-router"
 
 import {
   Sidebar,
@@ -11,16 +12,21 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-// Menu items.
+// For some reason this file is giving an error on vscode, but it doesn't seem to affect the build or functionality.
+// Asking chatGPT didn't help either, but for now this functions as intended. 
+// This code was directly lifted from the components/ui/sidebar documentation from Shadcn/ui.
+
+// Actual menu items.
+// When adding new routes, remember to also update the router configuration in router before putting new items here or you will get 404s.
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
     title: "Doctors",
-    url: "#",
+    url: "/doctors",
     icon: Inbox,
   },
   {
@@ -40,6 +46,7 @@ const items = [
   },
 ]
 
+// The AppSidebar component which actually renders the sidebar.
 export function AppSidebar() {
   return (
     <Sidebar>
@@ -51,10 +58,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
