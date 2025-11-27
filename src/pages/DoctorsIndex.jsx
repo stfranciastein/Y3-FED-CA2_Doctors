@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import instance from '@/config/api';
 
 // From shadcn/ui components. Most of this is just from their docs and examples and the festivals example.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,7 +24,9 @@ export default function DoctorsIndex() {
         setLoading(true);
         // When you get home, remember to remove this and turn this into a separate config file with environment variables for production use.
         // AKA, do not hardcode the API URL in the component, use environment variables instead and leave the /doctors endpoint here.
-        const response = await axios.get('https://ca2-med-api.vercel.app/doctors');
+        const response = await instance.get('/doctors');
+        // Nevermind, I just made a config/api.js file to handle axios instance with baseURL and did it in class.
+        // Maybe investigate a way to refactor the api call to just read the endpoint without hardcoding? Maybe not worth it but you're probably bored.
         setDoctors(response.data);
         setError(null);
       } catch (err) {
