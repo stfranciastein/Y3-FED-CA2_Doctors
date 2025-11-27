@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 // ForwardRef is used to pass refs to the underlying DOM elements.
 // The way this works is that it forwards the ref from the parent component to the child component.
 // This is useful for scenarios like animations or integrating with third-party libraries.
+// On this card, I'm using it to allow parent components to directly access the card's DOM node if needed.
 // Prop drilling is also supported as per Moe's notes in class from a week(?) ago.
 const Card = React.forwardRef(({ className, ...props }, ref) => (
   <div
