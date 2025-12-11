@@ -53,6 +53,11 @@ const data = {
       icon: IconTicket,
     },
     {
+      title: "Patients",
+      url: "/patients",
+      icon: IconUsers,
+    },
+    {
       title: "Cities",
       url: "#",
       icon: IconMapPin,
@@ -126,7 +131,7 @@ export function AppSidebar({
                   <circle cx="6" cy="18" r="3" />
                   <circle cx="18" cy="16" r="3" />
                 </svg>
-                <span className="text-base font-semibold">Harper.fest</span>
+                <span className="text-base font-semibold">IADT Medical</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
