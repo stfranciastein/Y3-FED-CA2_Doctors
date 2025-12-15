@@ -58,9 +58,9 @@ const data = {
       icon: IconUsers,
     },
     {
-      title: "Cities",
-      url: "#",
-      icon: IconMapPin,
+      title: "Appointments",
+      url: "/appointments",
+      icon: IconListDetails,
     },
   ],
 }

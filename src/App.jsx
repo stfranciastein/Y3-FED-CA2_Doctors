@@ -19,6 +19,11 @@ import PatientPage from '@/pages/patients/Show.jsx';
 import PatientForm from '@/pages/patients/create.jsx';
 import PatientDelete from '@/pages/patients/delete.jsx';
 
+import AppointmentsIndex from '@/pages/appointments/index.jsx';
+import AppointmentPage from '@/pages/appointments/Show.jsx';
+import AppointmentForm from '@/pages/appointments/create.jsx';
+import AppointmentDelete from '@/pages/appointments/delete.jsx';
+
 export default function App() {
 
 return (
@@ -51,6 +56,12 @@ return (
                 <Route path="/patients/:id/edit" element={<PatientForm />} />
                 <Route path="/patients/:id/delete" element={<PatientDelete />} />
                 <Route path="/patients/:id" element={<PatientPage />} />
+
+                <Route path="/appointments" element={<AppointmentsIndex />} />
+                <Route path="/appointments/create" element={<AppointmentForm />} /> 
+                <Route path="/appointments/:id/edit" element={<AppointmentForm />} />
+                <Route path="/appointments/:id/delete" element={<AppointmentDelete />} />
+                <Route path="/appointments/:id" element={<AppointmentPage />} />
               </Routes>
             </div>
           </div>

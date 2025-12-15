@@ -23,18 +23,11 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { Eye, Pencil, Grid, List } from 'lucide-react';
+import { useViewMode } from '@/hooks/useViewMode';
 
 export default function PatientsIndex() {
   const [response, setResponse] = useState([]);
-  const [viewMode, setViewMode] = useState(() => {
-    return localStorage.getItem('patientsViewMode') || 'table';
-  });
-
-  const toggleViewMode = () => {
-    const newMode = viewMode === 'table' ? 'cards' : 'table';
-    setViewMode(newMode);
-    localStorage.setItem('patientsViewMode', newMode);
-  };
+  const { viewMode, toggleViewMode } = useViewMode('patientsViewMode');
 
   useEffect(() => {
     const fetchPatients = async () => {
