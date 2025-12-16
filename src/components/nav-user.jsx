@@ -1,10 +1,7 @@
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogin,
   IconLogout,
-  IconNotification,
-  IconUserCircle,
   IconMoon,
   IconSun,
 } from "@tabler/icons-react"
@@ -96,18 +93,6 @@ export function NavUser({
                   <DropdownMenuItem onClick={toggleDarkMode}>
                     {isDarkMode ? <IconSun /> : <IconMoon />}
                     {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <IconUserCircle />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <IconCreditCard />
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <IconNotification />
-                    Notifications
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
