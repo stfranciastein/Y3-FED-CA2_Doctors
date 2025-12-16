@@ -258,7 +258,10 @@ export default function AppointmentForm() {
                     />
                     {errors.appointment_time && <p className="text-red-500 text-sm mt-1">{errors.appointment_time.message}</p>}
                     
-                    <Button type="submit">{isEditMode ? 'Update' : 'Create'} Appointment</Button>
+                    <div className="flex gap-2">
+                        <Button type="submit">{isEditMode ? 'Update' : 'Create'} Appointment</Button>
+                        <Button type="button" variant="outline" onClick={() => navigate('/appointments')}>Cancel</Button>
+                    </div>
                 </div>
             </form>
         </div>

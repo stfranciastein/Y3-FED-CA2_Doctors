@@ -241,7 +241,10 @@ export default function PatientForm() {
                         onChange={handleChange}
                     />
                     
-                    <Button type="submit">{isEditMode ? 'Update' : 'Create'} Patient</Button>
+                    <div className="flex gap-2">
+                        <Button type="submit">{isEditMode ? 'Update' : 'Create'} Patient</Button>
+                        <Button type="button" variant="outline" onClick={() => navigate('/patients')}>Cancel</Button>
+                    </div>
                 </div>
             </form>
         </div>

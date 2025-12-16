@@ -322,7 +322,10 @@ export default function PrescriptionForm() {
                     />
                     {errors.end_date && <p className="text-red-500 text-sm mt-1">{errors.end_date.message}</p>}
                     
-                    <Button type="submit">{isEditMode ? 'Update' : 'Create'} Prescription</Button>
+                    <div className="flex gap-2">
+                        <Button type="submit">{isEditMode ? 'Update' : 'Create'} Prescription</Button>
+                        <Button type="button" variant="outline" onClick={() => navigate('/prescriptions')}>Cancel</Button>
+                    </div>
                 </div>
             </form>
         </div>

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table"
 
 import DeleteBtn from '@/components/DeleteBtn';
+import IndexToolbar from '@/components/IndexToolbar';
 
 import {
   Card,
@@ -24,12 +25,14 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Grid, List } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import { useViewMode } from '@/hooks/useViewMode';
 
 export default function DoctorsIndex() {
 // Originally, this const used doctors, response is used to make it easy to reuse this code later for other API requests.
   const [response, setResponse] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('doctorsViewMode');
 
   const fetchDoctors = async () => {
@@ -103,37 +106,39 @@ export default function DoctorsIndex() {
         return '';
     }
 
+    const filteredDoctors = response.filter(doctor => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        doctor.first_name.toLowerCase().includes(searchLower) ||
+        doctor.last_name.toLowerCase().includes(searchLower) ||
+        doctor.email.toLowerCase().includes(searchLower) ||
+        doctor.phone.toLowerCase().includes(searchLower) ||
+        doctor.specialisation.toLowerCase().includes(searchLower) ||
+        doctor.id.toString().includes(searchLower)
+      );
+    }).sort((a, b) => {
+      const aName = `${a.first_name} ${a.last_name}`;
+      const bName = `${b.first_name} ${b.last_name}`;
+      return sortOrder === 'asc' ? aName.localeCompare(bName) : bName.localeCompare(aName);
+    });
+
     return (
         <>
-            <div className="flex gap-2 mb-4">
-                <Button
-                    asChild
-                    variant='outline'
-                >
-                    <Link to="/doctors/create">Add Doctor</Link>
-                </Button>
-                
-                <Button
-                    variant='outline'
-                    onClick={toggleViewMode}
-                >
-                    {viewMode === 'table' ? (
-                        <>
-                            <Grid size={18} className="mr-2" />
-                            Cards
-                        </>
-                    ) : (
-                        <>
-                            <List size={18} className="mr-2" />
-                            Table
-                        </>
-                    )}
-                </Button>
-            </div>
+            <IndexToolbar
+                searchTerm={searchTerm}
+                onSearchChange={(e) => setSearchTerm(e.target.value)}
+                searchPlaceholder="Search doctors..."
+                addLink="/doctors/create"
+                addText="Add Doctor"
+                sortOrder={sortOrder}
+                onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                viewMode={viewMode}
+                onViewToggle={toggleViewMode}
+            />
 
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {response.map((doctor) => (
+                    {filteredDoctors.map((doctor) => (
                             <Card key={doctor.id}>
                                 <CardHeader>
                                     <CardTitle>{doctor.first_name} {doctor.last_name}</CardTitle>
@@ -171,7 +176,7 @@ export default function DoctorsIndex() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {response.map((doctor) => (
+                        {filteredDoctors.map((doctor) => (
                             <TableRow key={doctor.id}>
                                 <TableCell className="font-medium">{doctor.id}</TableCell>
                                 <TableCell>{doctor.first_name}</TableCell>

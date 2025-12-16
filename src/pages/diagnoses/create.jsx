@@ -216,7 +216,10 @@ export default function DiagnosisForm() {
                     />
                     {errors.diagnosis_date && <p className="text-red-500 text-sm mt-1">{errors.diagnosis_date.message}</p>}
                     
-                    <Button type="submit">{isEditMode ? 'Update' : 'Create'} Diagnosis</Button>
+                    <div className="flex gap-2">
+                        <Button type="submit">{isEditMode ? 'Update' : 'Create'} Diagnosis</Button>
+                        <Button type="button" variant="outline" onClick={() => navigate('/diagnoses')}>Cancel</Button>
+                    </div>
                 </div>
             </form>
         </div>

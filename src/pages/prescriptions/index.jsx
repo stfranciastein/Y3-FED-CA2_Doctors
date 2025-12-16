@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table"
 
 import DeleteBtn from '@/components/DeleteBtn';
+import IndexToolbar from '@/components/IndexToolbar';
 
 import {
   Card,
@@ -22,13 +23,15 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Grid, List } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import { useViewMode } from '@/hooks/useViewMode';
 
 export default function PrescriptionsIndex() {
   const [response, setResponse] = useState([]);
   const [patients, setPatients] = useState({});
   const [doctors, setDoctors] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('prescriptionsViewMode');
 
   const fetchPrescriptions = async () => {
@@ -80,37 +83,42 @@ export default function PrescriptionsIndex() {
     return new Date(dateValue).toLocaleDateString();
   };
 
+  const filteredPrescriptions = response.filter(prescription => {
+    const searchLower = searchTerm.toLowerCase();
+    const patientName = patients[prescription.patient_id]
+      ? `${patients[prescription.patient_id].first_name} ${patients[prescription.patient_id].last_name}`.toLowerCase()
+      : '';
+    const doctorName = doctors[prescription.doctor_id]
+      ? `${doctors[prescription.doctor_id].first_name} ${doctors[prescription.doctor_id].last_name}`.toLowerCase()
+      : '';
+    return (
+      prescription.medication.toLowerCase().includes(searchLower) ||
+      prescription.dosage.toLowerCase().includes(searchLower) ||
+      patientName.includes(searchLower) ||
+      doctorName.includes(searchLower) ||
+      prescription.id.toString().includes(searchLower)
+    );
+  }).sort((a, b) => {
+    return sortOrder === 'asc' ? a.medication.localeCompare(b.medication) : b.medication.localeCompare(a.medication);
+  });
+
     return (
         <>
-            <div className="flex gap-2 mb-4">
-                <Button
-                    asChild
-                    variant='outline'
-                >
-                    <Link to="/prescriptions/create">Add Prescription</Link>
-                </Button>
-                
-                <Button
-                    variant='outline'
-                    onClick={toggleViewMode}
-                >
-                    {viewMode === 'table' ? (
-                        <>
-                            <Grid size={18} className="mr-2" />
-                            Cards
-                        </>
-                    ) : (
-                        <>
-                            <List size={18} className="mr-2" />
-                            Table
-                        </>
-                    )}
-                </Button>
-            </div>
+            <IndexToolbar
+                searchTerm={searchTerm}
+                onSearchChange={(e) => setSearchTerm(e.target.value)}
+                searchPlaceholder="Search prescriptions..."
+                addLink="/prescriptions/create"
+                addText="Add Prescription"
+                sortOrder={sortOrder}
+                onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                viewMode={viewMode}
+                onViewToggle={toggleViewMode}
+            />
 
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {response.map((prescription) => (
+                    {filteredPrescriptions.map((prescription) => (
                             <Card key={prescription.id}>
                                 <CardHeader>
                                     <CardTitle>{prescription.medication}</CardTitle>
@@ -172,7 +180,7 @@ export default function PrescriptionsIndex() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {response.map((prescription) => (
+                        {filteredPrescriptions.map((prescription) => (
                             <TableRow key={prescription.id}>
                                 <TableCell className="font-medium">{prescription.id}</TableCell>
                                 <TableCell>{prescription.medication}</TableCell>

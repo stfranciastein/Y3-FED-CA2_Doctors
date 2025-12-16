@@ -191,7 +191,10 @@ export default function DoctorForm() {
                             <SelectItem value="Podiatrist">Podiatrist</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button type="submit">{isEditMode ? 'Update' : 'Create'} Doctor</Button>
+                    <div className="flex gap-2">
+                        <Button type="submit">{isEditMode ? 'Update' : 'Create'} Doctor</Button>
+                        <Button type="button" variant="outline" onClick={() => navigate('/doctors')}>Cancel</Button>
+                    </div>
                 </div>
             </form>
         </div>

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table"
 
 import DeleteBtn from '@/components/DeleteBtn';
+import IndexToolbar from '@/components/IndexToolbar';
 
 import {
   Card,
@@ -22,13 +23,15 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Grid, List } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import { useViewMode } from '@/hooks/useViewMode';
 
 export default function AppointmentsIndex() {
   const [response, setResponse] = useState([]);
   const [doctors, setDoctors] = useState({});
   const [patients, setPatients] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('appointmentsViewMode');
 
   const fetchAppointments = async () => {
@@ -79,37 +82,39 @@ export default function AppointmentsIndex() {
     return new Date(dateValue).toLocaleString();
   };
 
+  const filteredAppointments = response.filter(appointment => {
+    const searchLower = searchTerm.toLowerCase();
+    const doctorName = doctors[appointment.doctor_id] 
+      ? `${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}`.toLowerCase()
+      : '';
+    const patientName = patients[appointment.patient_id]
+      ? `${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}`.toLowerCase()
+      : '';
+    const appointmentId = appointment.id.toString();
+    return doctorName.includes(searchLower) || patientName.includes(searchLower) || appointmentId.includes(searchLower);
+  }).sort((a, b) => {
+    const aName = patients[a.patient_id] ? `${patients[a.patient_id].first_name} ${patients[a.patient_id].last_name}` : '';
+    const bName = patients[b.patient_id] ? `${patients[b.patient_id].first_name} ${patients[b.patient_id].last_name}` : '';
+    return sortOrder === 'asc' ? aName.localeCompare(bName) : bName.localeCompare(aName);
+  });
+
     return (
         <>
-            <div className="flex gap-2 mb-4">
-                <Button
-                    asChild
-                    variant='outline'
-                >
-                    <Link to="/appointments/create">Add Appointment</Link>
-                </Button>
-                
-                <Button
-                    variant='outline'
-                    onClick={toggleViewMode}
-                >
-                    {viewMode === 'table' ? (
-                        <>
-                            <Grid size={18} className="mr-2" />
-                            Cards
-                        </>
-                    ) : (
-                        <>
-                            <List size={18} className="mr-2" />
-                            Table
-                        </>
-                    )}
-                </Button>
-            </div>
+            <IndexToolbar
+                searchTerm={searchTerm}
+                onSearchChange={(e) => setSearchTerm(e.target.value)}
+                searchPlaceholder="Search appointments..."
+                addLink="/appointments/create"
+                addText="Add Appointment"
+                sortOrder={sortOrder}
+                onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                viewMode={viewMode}
+                onViewToggle={toggleViewMode}
+            />
 
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {response.map((appointment) => (
+                    {filteredAppointments.map((appointment) => (
                             <Card key={appointment.id}>
                                 <CardHeader>
                                     <CardTitle>Appointment #{appointment.id}</CardTitle>
@@ -162,7 +167,7 @@ export default function AppointmentsIndex() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {response.map((appointment) => (
+                        {filteredAppointments.map((appointment) => (
                             <TableRow key={appointment.id}>
                                 <TableCell className="font-medium">{appointment.id}</TableCell>
                                 <TableCell>

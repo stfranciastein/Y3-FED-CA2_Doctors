@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table"
 
 import DeleteBtn from '@/components/DeleteBtn';
+import IndexToolbar from '@/components/IndexToolbar';
 
 import {
   Card,
@@ -22,12 +23,14 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Grid, List } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import { useViewMode } from '@/hooks/useViewMode';
 
 export default function DiagnosesIndex() {
   const [response, setResponse] = useState([]);
   const [patients, setPatients] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('diagnosesViewMode');
 
   const fetchDiagnoses = async () => {
@@ -65,37 +68,37 @@ export default function DiagnosesIndex() {
     toggleViewMode();
   };
 
+  const filteredDiagnoses = response.filter(diagnosis => {
+    const searchLower = searchTerm.toLowerCase();
+    const patientName = patients[diagnosis.patient_id]
+      ? `${patients[diagnosis.patient_id].first_name} ${patients[diagnosis.patient_id].last_name}`.toLowerCase()
+      : '';
+    return (
+      diagnosis.condition.toLowerCase().includes(searchLower) ||
+      patientName.includes(searchLower) ||
+      diagnosis.id.toString().includes(searchLower)
+    );
+  }).sort((a, b) => {
+    return sortOrder === 'asc' ? a.condition.localeCompare(b.condition) : b.condition.localeCompare(a.condition);
+  });
+
     return (
         <>
-            <div className="flex gap-2 mb-4">
-                <Button
-                    asChild
-                    variant='outline'
-                >
-                    <Link to="/diagnoses/create">Add Diagnosis</Link>
-                </Button>
-                
-                <Button
-                    variant='outline'
-                    onClick={toggleViewModeHandler}
-                >
-                    {viewMode === 'table' ? (
-                        <>
-                            <Grid size={18} className="mr-2" />
-                            Cards
-                        </>
-                    ) : (
-                        <>
-                            <List size={18} className="mr-2" />
-                            Table
-                        </>
-                    )}
-                </Button>
-            </div>
+            <IndexToolbar
+                searchTerm={searchTerm}
+                onSearchChange={(e) => setSearchTerm(e.target.value)}
+                searchPlaceholder="Search diagnoses..."
+                addLink="/diagnoses/create"
+                addText="Add Diagnosis"
+                sortOrder={sortOrder}
+                onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                viewMode={viewMode}
+                onViewToggle={toggleViewModeHandler}
+            />
 
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {response.map((diagnosis) => {
+                    {filteredDiagnoses.map((diagnosis) => {
                         const diagnosisDate = typeof diagnosis.diagnosis_date === 'number'
                             ? new Date(diagnosis.diagnosis_date * 1000).toLocaleDateString()
                             : new Date(diagnosis.diagnosis_date).toLocaleDateString();
@@ -145,7 +148,7 @@ export default function DiagnosesIndex() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {response.map((diagnosis) => {
+                        {filteredDiagnoses.map((diagnosis) => {
                             const diagnosisDate = typeof diagnosis.diagnosis_date === 'number'
                                 ? new Date(diagnosis.diagnosis_date * 1000).toLocaleDateString()
                                 : new Date(diagnosis.diagnosis_date).toLocaleDateString();
