@@ -50,7 +50,7 @@ export default function LoginForm() {
     <>
     {/* The purpose of this form is to allow users to log in to their accounts.
     In order to submit things to the API it expects a JSON which is what this submits. */}
-      <Card className="w-full max-w-sm">
+      <Card className="w-full bg-white/95 backdrop-blur border-white/20">
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
@@ -59,7 +59,7 @@ export default function LoginForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(submitForm)}>
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -96,12 +96,11 @@ export default function LoginForm() {
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex-col gap-2">
+        <CardFooter>
           <Button 
-            variant='outline' 
             onClick={handleSubmit(submitForm)} 
             type="submit" 
-            className="w-full"
+            className="w-full bg-teal-600 hover:bg-teal-700"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Logging in...' : 'Login'}

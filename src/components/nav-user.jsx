@@ -7,6 +7,7 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react"
 
+import { useNavigate } from "react-router"
 import { useAuth } from "@/hooks/useAuth"
 
 import {
@@ -35,9 +36,11 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const { onLogout } = useAuth()
+  const navigate = useNavigate()
 
   const handleLogout = () => {
     onLogout();
+    navigate('/');
   }
 
   const isLoggedIn = user.email !== "Please log in";

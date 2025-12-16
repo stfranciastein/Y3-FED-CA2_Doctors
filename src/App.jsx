@@ -24,52 +24,66 @@ import AppointmentPage from '@/pages/appointments/Show.jsx';
 import AppointmentForm from '@/pages/appointments/create.jsx';
 import AppointmentDelete from '@/pages/appointments/delete.jsx';
 
+import DiagnosesIndex from '@/pages/diagnoses/index.jsx';
+import DiagnosisPage from '@/pages/diagnoses/Show.jsx';
+import DiagnosisForm from '@/pages/diagnoses/create.jsx';
+import DiagnosisDelete from '@/pages/diagnoses/delete.jsx';
+
 export default function App() {
 
 return (
     <Router>
       <AuthProvider>
-      <SidebarProvider
-        style={{
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        }}
-      >
-        <AppSidebar variant="inset" />
-        <SidebarInset>
-          <SiteHeader />
+        <Routes>
+          {/* Home page - Full screen without sidebar */}
+          <Route path="/" element={<Home />} />
 
-          <div className="flex flex-1 flex-col p-4 md:p-6">
-            <div className="flex flex-1 flex-col gap-4 md:gap-6">
-              {/* Main content */}
-              <Routes>
-                <Route path="/" element={<Home />} />
+          {/* All other routes - With sidebar layout */}
+          <Route path="/*" element={
+            <SidebarProvider
+              style={{
+                "--sidebar-width": "calc(var(--spacing) * 72)",
+                "--header-height": "calc(var(--spacing) * 12)",
+              }}
+            >
+              <AppSidebar variant="inset" />
+              <SidebarInset>
+                <SiteHeader />
 
-                <Route path="/doctors" element={<DoctorsIndex />} />
-                <Route path="/doctors/create" element={<DoctorForm />} /> 
-                <Route path="/doctors/:id/edit" element={<DoctorForm />} />
-                <Route path="/doctors/:id/delete" element={<DoctorDelete />} />
-                <Route path="/doctors/:id" element={<DoctorPage />} />
+                <div className="flex flex-1 flex-col p-4 md:p-6">
+                  <div className="flex flex-1 flex-col gap-4 md:gap-6">
+                    <Routes>
+                      <Route path="/doctors" element={<DoctorsIndex />} />
+                      <Route path="/doctors/create" element={<DoctorForm />} /> 
+                      <Route path="/doctors/:id/edit" element={<DoctorForm />} />
+                      <Route path="/doctors/:id/delete" element={<DoctorDelete />} />
+                      <Route path="/doctors/:id" element={<DoctorPage />} />
 
-                <Route path="/patients" element={<PatientsIndex />} />
-                <Route path="/patients/create" element={<PatientForm />} /> 
-                <Route path="/patients/:id/edit" element={<PatientForm />} />
-                <Route path="/patients/:id/delete" element={<PatientDelete />} />
-                <Route path="/patients/:id" element={<PatientPage />} />
+                      <Route path="/patients" element={<PatientsIndex />} />
+                      <Route path="/patients/create" element={<PatientForm />} /> 
+                      <Route path="/patients/:id/edit" element={<PatientForm />} />
+                      <Route path="/patients/:id/delete" element={<PatientDelete />} />
+                      <Route path="/patients/:id" element={<PatientPage />} />
 
-                <Route path="/appointments" element={<AppointmentsIndex />} />
-                <Route path="/appointments/create" element={<AppointmentForm />} /> 
-                <Route path="/appointments/:id/edit" element={<AppointmentForm />} />
-                <Route path="/appointments/:id/delete" element={<AppointmentDelete />} />
-                <Route path="/appointments/:id" element={<AppointmentPage />} />
-              </Routes>
-            </div>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+                      <Route path="/appointments" element={<AppointmentsIndex />} />
+                      <Route path="/appointments/create" element={<AppointmentForm />} /> 
+                      <Route path="/appointments/:id/edit" element={<AppointmentForm />} />
+                      <Route path="/appointments/:id/delete" element={<AppointmentDelete />} />
+                      <Route path="/appointments/:id" element={<AppointmentPage />} />
 
+                      <Route path="/diagnoses" element={<DiagnosesIndex />} />
+                      <Route path="/diagnoses/create" element={<DiagnosisForm />} /> 
+                      <Route path="/diagnoses/:id/edit" element={<DiagnosisForm />} />
+                      <Route path="/diagnoses/:id/delete" element={<DiagnosisDelete />} />
+                      <Route path="/diagnoses/:id" element={<DiagnosisPage />} />
+                    </Routes>
+                  </div>
+                </div>
+              </SidebarInset>
+            </SidebarProvider>
+          } />
+        </Routes>
       </AuthProvider> 
-
     </Router>
   );
 }

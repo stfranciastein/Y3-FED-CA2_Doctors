@@ -62,6 +62,11 @@ const data = {
       url: "/appointments",
       icon: IconListDetails,
     },
+    {
+      title: "Diagnoses",
+      url: "/diagnoses",
+      icon: IconFileDescription,
+    },
   ],
 }
 
@@ -138,7 +143,7 @@ export function AppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain.filter(item => item.title !== "Dashboard")} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
