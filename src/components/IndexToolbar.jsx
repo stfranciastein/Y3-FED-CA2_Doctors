@@ -1,7 +1,15 @@
 import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
-import { Grid, List, Plus, ArrowUpDown } from 'lucide-react';
+import { Grid, List, Plus, ArrowUpDown, Check } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function IndexToolbar({ 
   searchTerm, 
@@ -9,8 +17,10 @@ export default function IndexToolbar({
   searchPlaceholder,
   addLink,
   addText,
+  sortField,
   sortOrder,
-  onSortToggle,
+  onSortChange,
+  sortOptions = [],
   viewMode,
   onViewToggle
 }) {
@@ -29,17 +39,47 @@ export default function IndexToolbar({
         </Link>
       </Button>
       
-      <Button
-        variant='outline'
-        onClick={onSortToggle}
-        title={sortOrder === 'asc' ? 'Sort Z-A' : 'Sort A-Z'}
-      >
-        <ArrowUpDown size={18} />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant='outline'
+            title="Sort options"
+          >
+            <ArrowUpDown size={18} className="md:mr-2" />
+            <span className="hidden md:inline">Sort</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {sortOptions.map((option) => (
+            <DropdownMenuItem
+              key={option.value}
+              onClick={() => onSortChange(option.value, sortField === option.value && sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="cursor-pointer"
+            >
+              <div className="flex items-center justify-between w-full">
+                <span>{option.label}</span>
+                <div className="flex items-center gap-1">
+                  {sortField === option.value && (
+                    <>
+                      <Check size={16} className="text-teal-600" />
+                      <span className="text-xs text-muted-foreground">
+                        {sortOrder === 'asc' ? '↑' : '↓'}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <Button
         variant='outline'
         onClick={onViewToggle}
+        title={viewMode === 'table' ? 'Switch to cards' : 'Switch to table'}
       >
         {viewMode === 'table' ? (
           <Grid size={18} />

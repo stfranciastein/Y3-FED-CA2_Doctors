@@ -29,8 +29,17 @@ import { useViewMode } from '@/hooks/useViewMode';
 export default function PatientsIndex() {
   const [response, setResponse] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('patientsViewMode');
+
+  const sortOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'email', label: 'Email' },
+    { value: 'phone', label: 'Phone' },
+    { value: 'date_of_birth', label: 'Date of Birth' },
+    { value: 'id', label: 'ID' },
+  ];
 
   const fetchPatients = async () => {
       const options = {
@@ -61,10 +70,49 @@ export default function PatientsIndex() {
       patient.id.toString().includes(searchLower)
     );
   }).sort((a, b) => {
-    const aName = `${a.first_name} ${a.last_name}`;
-    const bName = `${b.first_name} ${b.last_name}`;
-    return sortOrder === 'asc' ? aName.localeCompare(bName) : bName.localeCompare(aName);
+    let compareA, compareB;
+
+    switch (sortField) {
+      case 'name':
+        compareA = `${a.first_name} ${a.last_name}`.toLowerCase();
+        compareB = `${b.first_name} ${b.last_name}`.toLowerCase();
+        break;
+      case 'email':
+        compareA = a.email.toLowerCase();
+        compareB = b.email.toLowerCase();
+        break;
+      case 'phone':
+        compareA = a.phone;
+        compareB = b.phone;
+        break;
+      case 'date_of_birth':
+        compareA = new Date(a.date_of_birth).getTime();
+        compareB = new Date(b.date_of_birth).getTime();
+        break;
+      case 'id':
+        compareA = a.id;
+        compareB = b.id;
+        break;
+      default:
+        compareA = `${a.first_name} ${a.last_name}`.toLowerCase();
+        compareB = `${b.first_name} ${b.last_name}`.toLowerCase();
+    }
+
+    if (typeof compareA === 'string' && typeof compareB === 'string') {
+      return sortOrder === 'asc' 
+        ? compareA.localeCompare(compareB) 
+        : compareB.localeCompare(compareA);
+    } else {
+      return sortOrder === 'asc' 
+        ? compareA - compareB 
+        : compareB - compareA;
+    }
   });
+
+  const handleSortChange = (field, order) => {
+    setSortField(field);
+    setSortOrder(order);
+  };
 
     return (
         <>
@@ -74,8 +122,10 @@ export default function PatientsIndex() {
                 searchPlaceholder="Search patients..."
                 addLink="/patients/create"
                 addText="Add Patient"
+                sortField={sortField}
                 sortOrder={sortOrder}
-                onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                onSortChange={handleSortChange}
+                sortOptions={sortOptions}
                 viewMode={viewMode}
                 onViewToggle={toggleViewMode}
             />
