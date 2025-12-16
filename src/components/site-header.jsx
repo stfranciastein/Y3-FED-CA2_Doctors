@@ -15,6 +15,7 @@ export function SiteHeader() {
     if (path.startsWith('/appointments')) return 'Appointments';
     if (path.startsWith('/diagnoses')) return 'Diagnoses';
     if (path.startsWith('/prescriptions')) return 'Prescriptions';
+    if (path.startsWith('/stats')) return 'Statistics';
     
     return 'Documents';
   };

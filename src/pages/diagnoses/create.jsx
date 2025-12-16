@@ -166,7 +166,7 @@ export default function DiagnosisForm() {
                         onValueChange={(value) => setForm({ ...form, patient_id: value })} 
                         value={form.patient_id}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Patient" />
                         </SelectTrigger>
                         <SelectContent>

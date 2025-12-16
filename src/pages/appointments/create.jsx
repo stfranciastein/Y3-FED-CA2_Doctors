@@ -176,7 +176,7 @@ export default function AppointmentForm() {
                         onValueChange={(value) => setForm({ ...form, doctor_id: value })} 
                         value={form.doctor_id}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Doctor" />
                         </SelectTrigger>
                         <SelectContent>
@@ -192,7 +192,7 @@ export default function AppointmentForm() {
                         onValueChange={(value) => setForm({ ...form, patient_id: value })} 
                         value={form.patient_id}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Patient" />
                         </SelectTrigger>
                         <SelectContent>

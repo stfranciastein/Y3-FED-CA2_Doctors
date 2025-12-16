@@ -132,22 +132,22 @@ export default function DoctorPage() {
           {prescriptions.length > 0 && (
             <div className="mt-6">
               <h2 className="text-2xl font-bold mb-4">Prescriptions Issued ({prescriptions.length})</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
                 {prescriptions.map(prescription => (
-                  <Card key={prescription.id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        {prescription.medication}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 text-sm">
-                        <p>
-                          <span className="font-semibold">Dosage:</span>{' '}
-                          {prescription.dosage}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Patient:</span>{' '}
+                  <div key={prescription.id} className="border rounded-lg p-4 bg-white shadow-sm">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-lg">{prescription.medication}</h3>
+                      <span className="text-sm text-gray-500">
+                        {typeof prescription.start_date === 'number'
+                          ? new Date(prescription.start_date * 1000).toLocaleDateString()
+                          : new Date(prescription.start_date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <div className="flex items-center gap-4">
+                        <span><strong>Dosage:</strong> {prescription.dosage}</span>
+                        <span>
+                          <strong>Patient:</strong>{' '}
                           {patients[prescription.patient_id] ? (
                             <Link 
                               to={`/patients/${prescription.patient_id}`}
@@ -158,24 +158,17 @@ export default function DoctorPage() {
                           ) : (
                             `Patient ID: ${prescription.patient_id}`
                           )}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Start Date:</span>{' '}
-                          {typeof prescription.start_date === 'number'
-                            ? new Date(prescription.start_date * 1000).toLocaleDateString()
-                            : new Date(prescription.start_date).toLocaleDateString()}
-                        </p>
-                        {prescription.end_date && (
-                          <p>
-                            <span className="font-semibold">End Date:</span>{' '}
-                            {typeof prescription.end_date === 'number'
-                              ? new Date(prescription.end_date * 1000).toLocaleDateString()
-                              : new Date(prescription.end_date).toLocaleDateString()}
-                          </p>
-                        )}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
+                      {prescription.end_date && (
+                        <span className="text-gray-500">
+                          Ends: {typeof prescription.end_date === 'number'
+                            ? new Date(prescription.end_date * 1000).toLocaleDateString()
+                            : new Date(prescription.end_date).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

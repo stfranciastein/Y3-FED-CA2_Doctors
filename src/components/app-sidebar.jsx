@@ -43,9 +43,9 @@ const data = {
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "/",
-      icon: IconHome,
+      title: "Statistics",
+      url: "/stats",
+      icon: IconChartBar,
     },
     {
       title: "Doctors",

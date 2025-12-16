@@ -60,54 +60,49 @@ export default function LoginForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(submitForm)}>
-            <div className="flex flex-col gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    {...register("email")}
-                    className={errors.email ? "border-red-500" : ""}
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input 
-                    id="password"
-                    type="password"
-                    {...register("password")}
-                    className={errors.password ? "border-red-500" : ""}
-                />
-                {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
-                )}
-              </div>
+          <form onSubmit={handleSubmit(submitForm)} className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  {...register("email")}
+                  className={errors.email ? "border-red-500" : ""}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <a
+                  href="#"
+                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+              <Input 
+                  id="password"
+                  type="password"
+                  {...register("password")}
+                  className={errors.password ? "border-red-500" : ""}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500">{errors.password.message}</p>
+              )}
+            </div>
+            <Button 
+              type="submit" 
+              className={`w-full ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600' : 'bg-teal-600 hover:bg-teal-700'}`}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Logging in...' : 'Login'}
+            </Button>
           </form>
         </CardContent>
-        <CardFooter>
-          <Button 
-            onClick={handleSubmit(submitForm)} 
-            type="submit" 
-            className={`w-full ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600' : 'bg-teal-600 hover:bg-teal-700'}`}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Logging in...' : 'Login'}
-          </Button>
-        </CardFooter>
       </Card>
     </>
   );

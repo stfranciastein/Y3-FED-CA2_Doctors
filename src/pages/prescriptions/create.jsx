@@ -212,7 +212,7 @@ export default function PrescriptionForm() {
                         onValueChange={(value) => setForm({ ...form, patient_id: value })} 
                         value={form.patient_id}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Patient" />
                         </SelectTrigger>
                         <SelectContent>
@@ -228,7 +228,7 @@ export default function PrescriptionForm() {
                         onValueChange={(value) => setForm({ ...form, doctor_id: value })} 
                         value={form.doctor_id}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Doctor" />
                         </SelectTrigger>
                         <SelectContent>
@@ -244,7 +244,7 @@ export default function PrescriptionForm() {
                         onValueChange={(value) => setForm({ ...form, diagnosis_id: value })} 
                         value={form.diagnosis_id}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Diagnosis (Optional)" />
                         </SelectTrigger>
                         <SelectContent>

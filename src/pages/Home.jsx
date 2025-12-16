@@ -30,9 +30,9 @@ export default function Home() {
     const [showLogo, setShowLogo] = useState(false);
 
     useEffect(() => {
-        // If user is already logged in, redirect to dashboard
+        // If user is already logged in, redirect to stats dashboard
         if (token) {
-            navigate('/doctors');
+            navigate('/stats');
             return;
         }
 

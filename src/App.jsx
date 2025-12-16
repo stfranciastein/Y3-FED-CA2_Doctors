@@ -30,6 +30,8 @@ import PrescriptionsIndex from '@/pages/prescriptions/index.jsx';
 import PrescriptionPage from '@/pages/prescriptions/Show.jsx';
 import PrescriptionForm from '@/pages/prescriptions/create.jsx';
 
+import StatsIndex from '@/pages/stats/index.jsx';
+
 function DashboardLayout() {
   const { isDarkMode } = useDarkMode();
   
@@ -72,6 +74,8 @@ function DashboardLayout() {
                 <Route path="/prescriptions/create" element={<PrescriptionForm />} /> 
                 <Route path="/prescriptions/:id/edit" element={<PrescriptionForm />} />
                 <Route path="/prescriptions/:id" element={<PrescriptionPage />} />
+
+                <Route path="/stats" element={<StatsIndex />} />
               </Routes>
             </div>
           </div>

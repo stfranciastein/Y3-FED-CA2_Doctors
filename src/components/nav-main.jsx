@@ -8,6 +8,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function NavMain({
   items
@@ -19,12 +25,43 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-teal-600 text-white hover:bg-teal-700 hover:text-white active:bg-teal-700 active:text-white dark:bg-teal-500 dark:hover:bg-teal-600 min-w-8 duration-200 ease-linear">
-              <IconCirclePlusFilled />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  tooltip="Quick Create"
+                  className="bg-teal-600 text-white hover:bg-teal-700 hover:text-white active:bg-teal-700 active:text-white dark:bg-teal-500 dark:hover:bg-teal-600 min-w-8 duration-200 ease-linear">
+                  <IconCirclePlusFilled />
+                  <span>Quick Create</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/patients/create" className="cursor-pointer">
+                    Create New Patient
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/appointments/create" className="cursor-pointer">
+                    Schedule Appointment
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/prescriptions/create" className="cursor-pointer">
+                    New Prescription
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/doctors/create" className="cursor-pointer">
+                    Add Doctor
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/diagnoses/create" className="cursor-pointer">
+                    Record Diagnosis
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>

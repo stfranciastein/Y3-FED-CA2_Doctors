@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router';
 import axios from '@/config/api.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pencil } from 'lucide-react';
 import DeleteBtn from '@/components/DeleteBtn';
 
@@ -62,16 +63,19 @@ export default function PatientPage() {
 
     const fetchPrescriptions = async () => {
       try {
-        let response = await axios.get(`/patients/${id}/prescriptions`, {
+        let response = await axios.get(`/prescriptions`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log('Prescriptions:', response.data);
-        setPrescriptions(response.data);
+        console.log('All Prescriptions:', response.data);
+        
+        // Filter prescriptions for this patient
+        const patientPrescriptions = response.data.filter(presc => presc.patient_id === parseInt(id));
+        setPrescriptions(patientPrescriptions);
         
         // Fetch diagnosis details for each prescription
-        const diagnosisIds = [...new Set(response.data.map(presc => presc.diagnosis_id).filter(Boolean))];
+        const diagnosisIds = [...new Set(patientPrescriptions.map(presc => presc.diagnosis_id).filter(Boolean))];
         const diagnosisPromises = diagnosisIds.map(diagnosisId => 
           axios.get(`/diagnoses/${diagnosisId}`, {
             headers: { Authorization: `Bearer ${token}` }
@@ -157,112 +161,112 @@ export default function PatientPage() {
             </CardContent>
           </Card>
 
-          {appointments.length > 0 && (
+          {(appointments.length > 0 || prescriptions.length > 0) && (
             <div className="mt-6">
-              <h2 className="text-2xl font-bold mb-4">Appointments ({appointments.length})</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {appointments.map(appointment => (
-                  <Card key={appointment.id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        Appointment #{appointment.id}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 text-sm">
-                        <p>
-                          <span className="font-semibold">Date:</span>{' '}
-                          {typeof appointment.appointment_date === 'number'
-                            ? new Date(appointment.appointment_date * 1000).toLocaleString()
-                            : new Date(appointment.appointment_date).toLocaleString()}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Doctor:</span>{' '}
-                          {doctors[appointment.doctor_id] ? (
-                            <Link 
-                              to={`/doctors/${appointment.doctor_id}`}
-                              className="text-blue-600 hover:underline"
-                            >
-                              Dr. {doctors[appointment.doctor_id].first_name} {doctors[appointment.doctor_id].last_name}
-                            </Link>
-                          ) : (
-                            `Doctor ID: ${appointment.doctor_id}`
-                          )}
-                        </p>
-                        {doctors[appointment.doctor_id]?.specialisation && (
-                          <p>
-                            <span className="font-semibold">Specialisation:</span>{' '}
-                            {doctors[appointment.doctor_id].specialisation}
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
+              <Tabs defaultValue="appointments" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="appointments">Appointments ({appointments.length})</TabsTrigger>
+                  <TabsTrigger value="prescriptions">Prescriptions ({prescriptions.length})</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="appointments" className="mt-6">
+                  {appointments.length > 0 ? (
+                    <div className="space-y-3">
+                      {appointments.map(appointment => (
+                        <div key={appointment.id} className="border rounded-lg p-4 bg-white shadow-sm">
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-lg">Appointment #{appointment.id}</h3>
+                            <span className="text-sm text-gray-500">
+                              {typeof appointment.appointment_date === 'number'
+                                ? new Date(appointment.appointment_date * 1000).toLocaleString()
+                                : new Date(appointment.appointment_date).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm text-gray-600">
+                            <div className="flex items-center gap-4">
+                              <span>
+                                <strong>Doctor:</strong>{' '}
+                                {doctors[appointment.doctor_id] ? (
+                                  <Link 
+                                    to={`/doctors/${appointment.doctor_id}`}
+                                    className="text-blue-600 hover:underline"
+                                  >
+                                    Dr. {doctors[appointment.doctor_id].first_name} {doctors[appointment.doctor_id].last_name}
+                                  </Link>
+                                ) : (
+                                  `Doctor ID: ${appointment.doctor_id}`
+                                )}
+                              </span>
+                              {doctors[appointment.doctor_id]?.specialisation && (
+                                <span><strong>Specialisation:</strong> {doctors[appointment.doctor_id].specialisation}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-8">No appointments found</p>
+                  )}
+                </TabsContent>
 
-          {prescriptions.length > 0 && (
-            <div className="mt-6">
-              <h2 className="text-2xl font-bold mb-4">Prescriptions ({prescriptions.length})</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {prescriptions.map(prescription => (
-                  <Card key={prescription.id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        {prescription.medication}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 text-sm">
-                        <p>
-                          <span className="font-semibold">Dosage:</span>{' '}
-                          {prescription.dosage}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Start Date:</span>{' '}
-                          {typeof prescription.start_date === 'number'
-                            ? new Date(prescription.start_date * 1000).toLocaleDateString()
-                            : new Date(prescription.start_date).toLocaleDateString()}
-                        </p>
-                        {prescription.end_date && (
-                          <p>
-                            <span className="font-semibold">End Date:</span>{' '}
-                            {typeof prescription.end_date === 'number'
-                              ? new Date(prescription.end_date * 1000).toLocaleDateString()
-                              : new Date(prescription.end_date).toLocaleDateString()}
-                          </p>
-                        )}
-                        <p>
-                          <span className="font-semibold">Doctor:</span>{' '}
-                          {doctors[prescription.doctor_id] ? (
-                            <Link 
-                              to={`/doctors/${prescription.doctor_id}`}
-                              className="text-blue-600 hover:underline"
-                            >
-                              Dr. {doctors[prescription.doctor_id].first_name} {doctors[prescription.doctor_id].last_name}
-                            </Link>
-                          ) : (
-                            `Doctor ID: ${prescription.doctor_id}`
-                          )}
-                        </p>
-                        {diagnoses[prescription.diagnosis_id] && (
-                          <p>
-                            <span className="font-semibold">Diagnosis:</span>{' '}
-                            <Link 
-                              to={`/diagnoses/${prescription.diagnosis_id}`}
-                              className="text-blue-600 hover:underline"
-                            >
-                              {diagnoses[prescription.diagnosis_id].description}
-                            </Link>
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                <TabsContent value="prescriptions" className="mt-6">
+                  {prescriptions.length > 0 ? (
+                    <div className="space-y-3">
+                      {prescriptions.map(prescription => (
+                        <div key={prescription.id} className="border rounded-lg p-4 bg-white shadow-sm">
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-lg">{prescription.medication}</h3>
+                            <span className="text-sm text-gray-500">
+                              {typeof prescription.start_date === 'number'
+                                ? new Date(prescription.start_date * 1000).toLocaleDateString()
+                                : new Date(prescription.start_date).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm text-gray-600">
+                            <div className="flex items-center gap-4">
+                              <span><strong>Dosage:</strong> {prescription.dosage}</span>
+                              <span>
+                                <strong>Doctor:</strong>{' '}
+                                {doctors[prescription.doctor_id] ? (
+                                  <Link 
+                                    to={`/doctors/${prescription.doctor_id}`}
+                                    className="text-blue-600 hover:underline"
+                                  >
+                                    Dr. {doctors[prescription.doctor_id].first_name} {doctors[prescription.doctor_id].last_name}
+                                  </Link>
+                                ) : (
+                                  `Doctor ID: ${prescription.doctor_id}`
+                                )}
+                              </span>
+                              {diagnoses[prescription.diagnosis_id] && (
+                                <span>
+                                  <strong>Diagnosis:</strong>{' '}
+                                  <Link 
+                                    to={`/diagnoses/${prescription.diagnosis_id}`}
+                                    className="text-blue-600 hover:underline"
+                                  >
+                                    {diagnoses[prescription.diagnosis_id].description}
+                                  </Link>
+                                </span>
+                              )}
+                            </div>
+                            {prescription.end_date && (
+                              <span className="text-gray-500">
+                                Ends: {typeof prescription.end_date === 'number'
+                                  ? new Date(prescription.end_date * 1000).toLocaleDateString()
+                                  : new Date(prescription.end_date).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-8">No prescriptions found</p>
+                  )}
+                </TabsContent>
+              </Tabs>
             </div>
           )}
         </div>

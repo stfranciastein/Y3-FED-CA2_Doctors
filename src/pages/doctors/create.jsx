@@ -180,7 +180,7 @@ export default function DoctorForm() {
                         required 
                     />
                     <Select onValueChange={handleSelectChange} value={form.specialisation}>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Specialisation" />
                         </SelectTrigger>
                         <SelectContent>
