@@ -30,8 +30,16 @@ export default function DiagnosesIndex() {
   const [response, setResponse] = useState([]);
   const [patients, setPatients] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('condition');
   const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('diagnosesViewMode');
+
+  const sortOptions = [
+    { value: 'condition', label: 'Condition' },
+    { value: 'patient_name', label: 'Patient Name' },
+    { value: 'date', label: 'Date' },
+    { value: 'id', label: 'ID' }
+  ];
 
   const fetchDiagnoses = async () => {
       const token = localStorage.getItem('token');
@@ -79,8 +87,30 @@ export default function DiagnosesIndex() {
       diagnosis.id.toString().includes(searchLower)
     );
   }).sort((a, b) => {
-    return sortOrder === 'asc' ? a.condition.localeCompare(b.condition) : b.condition.localeCompare(a.condition);
+    let aValue, bValue;
+    
+    switch(sortField) {
+      case 'condition':
+        return sortOrder === 'asc' ? a.condition.localeCompare(b.condition) : b.condition.localeCompare(a.condition);
+      case 'patient_name':
+        aValue = patients[a.patient_id] ? `${patients[a.patient_id].first_name} ${patients[a.patient_id].last_name}` : '';
+        bValue = patients[b.patient_id] ? `${patients[b.patient_id].first_name} ${patients[b.patient_id].last_name}` : '';
+        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      case 'date':
+        aValue = new Date(a.diagnosis_date).getTime();
+        bValue = new Date(b.diagnosis_date).getTime();
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      case 'id':
+        return sortOrder === 'asc' ? a.id - b.id : b.id - a.id;
+      default:
+        return 0;
+    }
   });
+
+  const handleSortChange = (field, order) => {
+    setSortField(field);
+    setSortOrder(order);
+  };
 
     return (
         <>
@@ -90,8 +120,10 @@ export default function DiagnosesIndex() {
                 searchPlaceholder="Search diagnoses..."
                 addLink="/diagnoses/create"
                 addText="Add Diagnosis"
+                sortField={sortField}
                 sortOrder={sortOrder}
-                onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                onSortChange={handleSortChange}
+                sortOptions={sortOptions}
                 viewMode={viewMode}
                 onViewToggle={toggleViewModeHandler}
             />

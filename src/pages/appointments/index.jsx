@@ -31,8 +31,16 @@ export default function AppointmentsIndex() {
   const [doctors, setDoctors] = useState({});
   const [patients, setPatients] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('patient_name');
   const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('appointmentsViewMode');
+
+  const sortOptions = [
+    { value: 'patient_name', label: 'Patient Name' },
+    { value: 'doctor_name', label: 'Doctor Name' },
+    { value: 'date', label: 'Date' },
+    { value: 'id', label: 'ID' }
+  ];
 
   const fetchAppointments = async () => {
       const token = localStorage.getItem('token');
@@ -93,10 +101,32 @@ export default function AppointmentsIndex() {
     const appointmentId = appointment.id.toString();
     return doctorName.includes(searchLower) || patientName.includes(searchLower) || appointmentId.includes(searchLower);
   }).sort((a, b) => {
-    const aName = patients[a.patient_id] ? `${patients[a.patient_id].first_name} ${patients[a.patient_id].last_name}` : '';
-    const bName = patients[b.patient_id] ? `${patients[b.patient_id].first_name} ${patients[b.patient_id].last_name}` : '';
-    return sortOrder === 'asc' ? aName.localeCompare(bName) : bName.localeCompare(aName);
+    let aValue, bValue;
+    
+    switch(sortField) {
+      case 'patient_name':
+        aValue = patients[a.patient_id] ? `${patients[a.patient_id].first_name} ${patients[a.patient_id].last_name}` : '';
+        bValue = patients[b.patient_id] ? `${patients[b.patient_id].first_name} ${patients[b.patient_id].last_name}` : '';
+        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      case 'doctor_name':
+        aValue = doctors[a.doctor_id] ? `${doctors[a.doctor_id].first_name} ${doctors[a.doctor_id].last_name}` : '';
+        bValue = doctors[b.doctor_id] ? `${doctors[b.doctor_id].first_name} ${doctors[b.doctor_id].last_name}` : '';
+        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      case 'date':
+        aValue = new Date(typeof a.appointment_date === 'number' ? a.appointment_date * 1000 : a.appointment_date).getTime();
+        bValue = new Date(typeof b.appointment_date === 'number' ? b.appointment_date * 1000 : b.appointment_date).getTime();
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      case 'id':
+        return sortOrder === 'asc' ? a.id - b.id : b.id - a.id;
+      default:
+        return 0;
+    }
   });
+
+  const handleSortChange = (field, order) => {
+    setSortField(field);
+    setSortOrder(order);
+  };
 
     return (
         <>
@@ -106,8 +136,10 @@ export default function AppointmentsIndex() {
                 searchPlaceholder="Search appointments..."
                 addLink="/appointments/create"
                 addText="Add Appointment"
+                sortField={sortField}
                 sortOrder={sortOrder}
-                onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                onSortChange={handleSortChange}
+                sortOptions={sortOptions}
                 viewMode={viewMode}
                 onViewToggle={toggleViewMode}
             />

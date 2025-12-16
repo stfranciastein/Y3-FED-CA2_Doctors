@@ -31,8 +31,17 @@ export default function PrescriptionsIndex() {
   const [patients, setPatients] = useState({});
   const [doctors, setDoctors] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('medication');
   const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('prescriptionsViewMode');
+
+  const sortOptions = [
+    { value: 'medication', label: 'Medication' },
+    { value: 'patient_name', label: 'Patient Name' },
+    { value: 'doctor_name', label: 'Doctor Name' },
+    { value: 'start_date', label: 'Start Date' },
+    { value: 'id', label: 'ID' }
+  ];
 
   const fetchPrescriptions = async () => {
       const token = localStorage.getItem('token');
@@ -99,8 +108,34 @@ export default function PrescriptionsIndex() {
       prescription.id.toString().includes(searchLower)
     );
   }).sort((a, b) => {
-    return sortOrder === 'asc' ? a.medication.localeCompare(b.medication) : b.medication.localeCompare(a.medication);
+    let aValue, bValue;
+    
+    switch(sortField) {
+      case 'medication':
+        return sortOrder === 'asc' ? a.medication.localeCompare(b.medication) : b.medication.localeCompare(a.medication);
+      case 'patient_name':
+        aValue = patients[a.patient_id] ? `${patients[a.patient_id].first_name} ${patients[a.patient_id].last_name}` : '';
+        bValue = patients[b.patient_id] ? `${patients[b.patient_id].first_name} ${patients[b.patient_id].last_name}` : '';
+        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      case 'doctor_name':
+        aValue = doctors[a.doctor_id] ? `${doctors[a.doctor_id].first_name} ${doctors[a.doctor_id].last_name}` : '';
+        bValue = doctors[b.doctor_id] ? `${doctors[b.doctor_id].first_name} ${doctors[b.doctor_id].last_name}` : '';
+        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      case 'start_date':
+        aValue = new Date(typeof a.start_date === 'number' ? a.start_date * 1000 : a.start_date).getTime();
+        bValue = new Date(typeof b.start_date === 'number' ? b.start_date * 1000 : b.start_date).getTime();
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      case 'id':
+        return sortOrder === 'asc' ? a.id - b.id : b.id - a.id;
+      default:
+        return 0;
+    }
   });
+
+  const handleSortChange = (field, order) => {
+    setSortField(field);
+    setSortOrder(order);
+  };
 
     return (
         <>
@@ -110,8 +145,10 @@ export default function PrescriptionsIndex() {
                 searchPlaceholder="Search prescriptions..."
                 addLink="/prescriptions/create"
                 addText="Add Prescription"
+                sortField={sortField}
                 sortOrder={sortOrder}
-                onSortToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                onSortChange={handleSortChange}
+                sortOptions={sortOptions}
                 viewMode={viewMode}
                 onViewToggle={toggleViewMode}
             />
