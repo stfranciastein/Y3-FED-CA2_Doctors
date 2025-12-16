@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from '@/config/api.js';
+import axios, { fetchHolidays } from '@/config/api.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -17,6 +17,7 @@ export default function StatsIndex() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [doctors, setDoctors] = useState({});
   const [patients, setPatients] = useState({});
+  const [holidays, setHolidays] = useState([]);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -58,7 +59,18 @@ export default function StatsIndex() {
       }
     };
 
+    const loadHolidays = async () => {
+      const currentYear = new Date().getFullYear();
+      const holidaysData = await fetchHolidays('IE', currentYear);
+      const holidayDates = holidaysData.map(holiday => ({
+        date: new Date(holiday.date),
+        name: holiday.name
+      }));
+      setHolidays(holidayDates);
+    };
+
     fetchAllData();
+    loadHolidays();
   }, []);
 
   // Process data for charts
@@ -116,8 +128,22 @@ export default function StatsIndex() {
     });
   };
 
+  // Get holiday for a specific date
+  const getHolidayForDate = (date) => {
+    return holidays.find(holiday => {
+      return holiday.date.toDateString() === date.toDateString();
+    });
+  };
+
+  // Get just the holiday dates for modifiers
+  const getHolidayDates = () => {
+    return holidays.map(holiday => holiday.date);
+  };
+
   const appointmentsForSelectedDate = getAppointmentsForDate(selectedDate);
   const appointmentDates = getAppointmentDates();
+  const holidayDates = getHolidayDates();
+  const holidayForSelectedDate = getHolidayForDate(selectedDate);
 
   if (loading) {
     return <div className="flex items-center justify-center h-64">Loading statistics...</div>;
@@ -141,31 +167,101 @@ export default function StatsIndex() {
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Calendar */}
-            <div>
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => date && setSelectedDate(date)}
-                modifiers={{
-                  hasAppointments: appointmentDates
-                }}
-                modifiersStyles={{
-                  hasAppointments: { 
-                    backgroundColor: 'hsl(var(--primary))',
-                    color: 'hsl(var(--primary-foreground))',
-                    fontWeight: 'bold'
+            <div className="calendar-container w-fit mb-25">
+              <style dangerouslySetInnerHTML={{
+                __html: `
+                  .calendar-container .has-appointments {
+                    position: relative;
                   }
-                }}
-                className="rounded-md border"
-                numberOfMonths={1}
-              />
+                  .calendar-container .has-appointments::after {
+                    content: '●';
+                    position: absolute;
+                    top: 4px;
+                    right: 4px;
+                    font-size: 12px;
+                    color: #3b82f6;
+                    font-weight: bold;
+                    z-index: 3;
+                    text-shadow: 0 0 2px white;
+                  }
+                  .calendar-container .is-holiday {
+                    position: relative;
+                  }
+                  .calendar-container .is-holiday::before {
+                    content: '🎉';
+                    position: absolute;
+                    top: 2px;
+                    left: 2px;
+                    font-size: 10px;
+                    z-index: 3;
+                  }
+                  .calendar-container .rdp-day_selected.has-appointments::after {
+                    color: white;
+                    text-shadow: 0 0 2px rgba(0,0,0,0.5);
+                  }
+                  .calendar-container .rdp-day_selected.is-holiday::before {
+                    filter: brightness(1.2);
+                  }
+                `
+              }} />
+              <div onClick={(e) => e.preventDefault()} className="inline-block">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      setSelectedDate(date);
+                    }
+                  }}
+                  modifiers={{
+                    hasAppointments: appointmentDates,
+                    isHoliday: holidayDates
+                  }}
+                  modifiersStyles={{
+                    hasAppointments: { 
+                      backgroundColor: 'hsl(var(--primary))',
+                      color: 'hsl(var(--primary-foreground))',
+                      fontWeight: 'bold'
+                    },
+                    isHoliday: {
+                      backgroundColor: '#fef3c7',
+                      color: '#92400e',
+                      fontWeight: 'bold'
+                    }
+                  }}
+                  modifiersClassNames={{
+                    hasAppointments: 'has-appointments',
+                    isHoliday: 'is-holiday'
+                  }}
+                  className="rounded-md border scale-[1.35] origin-top-left"
+                  style={{ transformOrigin: 'top left' }}
+                  numberOfMonths={1}
+                />
+              </div>
             </div>
 
             {/* Appointments for selected date */}
             <div>
               <h3 className="text-lg font-semibold mb-3">
-                Appointments for {selectedDate.toLocaleDateString()}
+                {selectedDate.toLocaleDateString()}
               </h3>
+              
+              {/* Holiday information */}
+              {holidayForSelectedDate && (
+                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🎉</span>
+                    <div>
+                      <p className="font-medium text-amber-800">Holiday</p>
+                      <p className="text-sm text-amber-700">{holidayForSelectedDate.name}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <h4 className="font-medium mb-3">
+                Appointments ({appointmentsForSelectedDate.length})
+              </h4>
               {appointmentsForSelectedDate.length > 0 ? (
                 <div className="space-y-3 max-h-80 overflow-y-auto">
                   {appointmentsForSelectedDate.map(appointment => (

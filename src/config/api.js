@@ -6,4 +6,16 @@ const instance = axios.create({
     headers: {'Content-Type': 'application/json'}
 });
 
+// Fetch holidays from Nager.Date API
+export const fetchHolidays = async (countryCode = 'IE', year = new Date().getFullYear()) => {
+    try {
+        const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode}`);
+        const holidaysData = await response.json();
+        return holidaysData;
+    } catch (error) {
+        console.error('Error fetching holidays:', error);
+        return [];
+    }
+};
+
 export default instance;
