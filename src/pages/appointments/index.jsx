@@ -113,21 +113,28 @@ export default function AppointmentsIndex() {
                         <Card key={appointment.id}>
                             <CardHeader>
                                 <CardTitle>Appointment #{appointment.id}</CardTitle>
-                                <CardDescription>{formatDate(appointment.appointment_date)}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-1 text-sm">
                                     <p>
                                         <span className="font-semibold">Doctor:</span>{' '}
                                         {doctors[appointment.doctor_id] ? 
-                                            `Dr. ${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}` : 
+                                            <Link to={`/doctors/${appointment.doctor_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                                {`Dr. ${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}`}
+                                            </Link> : 
                                             `ID: ${appointment.doctor_id}`}
                                     </p>
                                     <p>
                                         <span className="font-semibold">Patient:</span>{' '}
                                         {patients[appointment.patient_id] ? 
-                                            `${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}` : 
+                                            <Link to={`/patients/${appointment.patient_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                                {`${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}`}
+                                            </Link> : 
                                             `ID: ${appointment.patient_id}`}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold">Date & Time:</span>{' '}
+                                        {formatDate(appointment.appointment_date)}
                                     </p>
                                 </div>
                             </CardContent>
@@ -148,9 +155,9 @@ export default function AppointmentsIndex() {
                     <TableHeader>
                         <TableRow>
                         <TableHead className="w-[100px]">ID</TableHead>
-                        <TableHead>Date & Time</TableHead>
                         <TableHead>Doctor</TableHead>
                         <TableHead>Patient</TableHead>
+                        <TableHead>Date & Time</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -158,17 +165,21 @@ export default function AppointmentsIndex() {
                         {response.map((appointment) => (
                             <TableRow key={appointment.id}>
                                 <TableCell className="font-medium">{appointment.id}</TableCell>
-                                <TableCell>{formatDate(appointment.appointment_date)}</TableCell>
                                 <TableCell>
                                     {doctors[appointment.doctor_id] ? 
-                                        `Dr. ${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}` : 
+                                        <Link to={`/doctors/${appointment.doctor_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                            {`Dr. ${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}`}
+                                        </Link> : 
                                         `ID: ${appointment.doctor_id}`}
                                 </TableCell>
                                 <TableCell>
                                     {patients[appointment.patient_id] ? 
-                                        `${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}` : 
+                                        <Link to={`/patients/${appointment.patient_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                            {`${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}`}
+                                        </Link> : 
                                         `ID: ${appointment.patient_id}`}
                                 </TableCell>
+                                <TableCell>{formatDate(appointment.appointment_date)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex gap-2 justify-end">
                                     <Button asChild variant="outline" size="sm">

@@ -110,7 +110,9 @@ export default function DiagnosesIndex() {
                                     <p>
                                         <span className="font-semibold">Patient:</span>{' '}
                                         {patients[diagnosis.patient_id] ? 
-                                            `${patients[diagnosis.patient_id].first_name} ${patients[diagnosis.patient_id].last_name}` : 
+                                            <Link to={`/patients/${diagnosis.patient_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                                {`${patients[diagnosis.patient_id].first_name} ${patients[diagnosis.patient_id].last_name}`}
+                                            </Link> : 
                                             `ID: ${diagnosis.patient_id}`}
                                     </p>
                                     <p>
@@ -153,7 +155,9 @@ export default function DiagnosesIndex() {
                                 <TableCell className="max-w-md truncate">{diagnosis.condition}</TableCell>
                                 <TableCell>
                                     {patients[diagnosis.patient_id] ? 
-                                        `${patients[diagnosis.patient_id].first_name} ${patients[diagnosis.patient_id].last_name}` : 
+                                        <Link to={`/patients/${diagnosis.patient_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                            {`${patients[diagnosis.patient_id].first_name} ${patients[diagnosis.patient_id].last_name}`}
+                                        </Link> : 
                                         `ID: ${diagnosis.patient_id}`}
                                 </TableCell>
                                 <TableCell>{diagnosisDate}</TableCell>

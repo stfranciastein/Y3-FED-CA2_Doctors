@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import axios, { fetchHolidays } from '@/config/api.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -6,6 +7,7 @@ import { ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "
 import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 export default function StatsIndex() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     patients: [],
     doctors: [],
@@ -231,59 +233,65 @@ export default function StatsIndex() {
 
             {/* Appointments for selected date */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">
-                {selectedDate.toLocaleDateString()}
-              </h3>
-              
               {/* Holiday information */}
               {holidayForSelectedDate && (
-                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">🎉</span>
-                    <div>
-                      <p className="font-medium text-amber-800">Holiday</p>
-                      <p className="text-sm text-amber-700">{holidayForSelectedDate.name}</p>
+                <Card className="mb-4 bg-amber-50 border-amber-200">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🎉</span>
+                      <div>
+                        <p className="font-medium text-amber-800">Holiday</p>
+                        <p className="text-sm text-amber-700">{holidayForSelectedDate.name}</p>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               )}
-
-              <h4 className="font-medium mb-3">
-                Appointments ({appointmentsForSelectedDate.length})
-              </h4>
               {appointmentsForSelectedDate.length > 0 ? (
                 <div className="space-y-3 max-h-80 overflow-y-auto">
                   {appointmentsForSelectedDate.map(appointment => (
-                    <div key={appointment.id} className="border rounded-lg p-3 bg-gray-50">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium">Appointment #{appointment.id}</h4>
-                        <span className="text-sm text-gray-500">
-                          {new Date(typeof appointment.appointment_date === 'number' 
-                            ? appointment.appointment_date * 1000 
-                            : appointment.appointment_date
-                          ).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <p>
-                          <strong>Patient:</strong> {patients[appointment.patient_id] 
-                            ? `${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}`
-                            : `Patient ID: ${appointment.patient_id}`}
-                        </p>
-                        <p>
-                          <strong>Doctor:</strong> {doctors[appointment.doctor_id] 
-                            ? `Dr. ${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}`
-                            : `Doctor ID: ${appointment.doctor_id}`}
-                        </p>
-                        {doctors[appointment.doctor_id]?.specialisation && (
-                          <p><strong>Specialisation:</strong> {doctors[appointment.doctor_id].specialisation}</p>
-                        )}
-                      </div>
-                    </div>
+                    <Card 
+                      key={appointment.id} 
+                      className="bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => navigate(`/appointments/${appointment.id}`)}
+                    >
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-center">
+                          <CardTitle className="text-base">Appointment #{appointment.id}</CardTitle>
+                          <span className="text-sm text-gray-500">
+                            {new Date(typeof appointment.appointment_date === 'number' 
+                              ? appointment.appointment_date * 1000 
+                              : appointment.appointment_date
+                            ).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="text-sm text-gray-600 space-y-1">
+                          <p>
+                            <strong>Patient:</strong> {patients[appointment.patient_id] 
+                              ? `${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}`
+                              : `Patient ID: ${appointment.patient_id}`}
+                          </p>
+                          <p>
+                            <strong>Doctor:</strong> {doctors[appointment.doctor_id] 
+                              ? `Dr. ${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}`
+                              : `Doctor ID: ${appointment.doctor_id}`}
+                          </p>
+                          {doctors[appointment.doctor_id]?.specialisation && (
+                            <p><strong>Specialisation:</strong> {doctors[appointment.doctor_id].specialisation}</p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">No appointments on this date</p>
+                <Card className="bg-gray-50">
+                  <CardContent className="text-center py-8">
+                    <p className="text-gray-500">No appointments on this date</p>
+                  </CardContent>
+                </Card>
               )}
             </div>
           </div>
