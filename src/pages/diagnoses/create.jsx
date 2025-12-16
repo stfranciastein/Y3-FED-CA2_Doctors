@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
-import { Label } from "@/components/ui/label";
 import axios from "@/config/api.js";
 import { toast } from "sonner";
 
@@ -156,51 +155,42 @@ export default function DiagnosisForm() {
             <h1 className="mb-4">{isEditMode ? 'Edit' : 'Create'} Diagnosis</h1>
             
             {error && (
-                <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded max-w-2xl">
+                <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded max-w-md">
                     {error}
                 </div>
             )}
             
             <form onSubmit={handleSubmit}>
-                <div className="flex flex-col gap-4 max-w-2xl">
-                    <div>
-                        <Label>Patient</Label>
-                        <Select 
-                            onValueChange={(value) => setForm({ ...form, patient_id: value })} 
-                            value={form.patient_id}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select Patient" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {patients.map(patient => (
-                                    <SelectItem key={patient.id} value={patient.id.toString()}>
-                                        {patient.first_name} {patient.last_name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                <div className="flex flex-col gap-2 max-w-md">
+                    <Select 
+                        onValueChange={(value) => setForm({ ...form, patient_id: value })} 
+                        value={form.patient_id}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select Patient" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {patients.map(patient => (
+                                <SelectItem key={patient.id} value={patient.id.toString()}>
+                                    {patient.first_name} {patient.last_name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                    <div>
-                        <Label>Condition *</Label>
-                        <Textarea
-                            value={form.condition}
-                            onChange={(e) => setForm({ ...form, condition: e.target.value })}
-                            placeholder="Enter condition details"
-                            rows={4}
-                            required
-                        />
-                    </div>
+                    <Textarea
+                        value={form.condition}
+                        onChange={(e) => setForm({ ...form, condition: e.target.value })}
+                        placeholder="Enter condition details"
+                        rows={4}
+                        required
+                    />
 
-                    <div>
-                        <Label>Diagnosis Date *</Label>
-                        <DatePicker
-                            value={form.diagnosis_date}
-                            onChange={(date) => setForm({ ...form, diagnosis_date: date })}
-                            placeholder="Select diagnosis date"
-                        />
-                    </div>
+                    <DatePicker
+                        value={form.diagnosis_date}
+                        onChange={(date) => setForm({ ...form, diagnosis_date: date })}
+                        placeholder="Select diagnosis date"
+                    />
                     
                     <Button type="submit">{isEditMode ? 'Update' : 'Create'} Diagnosis</Button>
                 </div>

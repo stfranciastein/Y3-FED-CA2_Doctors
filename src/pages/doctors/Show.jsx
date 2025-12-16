@@ -8,9 +8,11 @@ import DeleteBtn from '@/components/DeleteBtn';
 
 export default function DoctorPage() {
   const [response, setResponse] = useState(null);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [patients, setPatients] = useState({});
   const { id } = useParams();
 
-  let token = localStorage.getItem('token'); // Retrieve the token from local storage to use for authorised requests.
+  let token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchDoctor = async () => {
@@ -27,7 +29,40 @@ export default function DoctorPage() {
       }
     };
 
+    const fetchPrescriptions = async () => {
+      try {
+        let response = await axios.get(`/prescriptions`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        console.log('All Prescriptions:', response.data);
+        
+        // Filter prescriptions for this doctor
+        const doctorPrescriptions = response.data.filter(presc => presc.doctor_id === parseInt(id));
+        setPrescriptions(doctorPrescriptions);
+        
+        // Fetch patient details for each prescription
+        const patientIds = [...new Set(doctorPrescriptions.map(presc => presc.patient_id))];
+        const patientPromises = patientIds.map(patientId => 
+          axios.get(`/patients/${patientId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        );
+        
+        const patientResponses = await Promise.all(patientPromises);
+        const patientsMap = {};
+        patientResponses.forEach(res => {
+          patientsMap[res.data.id] = res.data;
+        });
+        setPatients(patientsMap);
+      } catch (err) {
+        console.log('Error fetching prescriptions:', err);
+      }
+    };
+
     fetchDoctor();
+    fetchPrescriptions();
   }, [id]);
 
   const formatDateForDisplay = (dateValue) => {
@@ -61,7 +96,7 @@ export default function DoctorPage() {
             </div>
           </div>
           
-          <Card>
+          <Card className="mb-6">
             <CardHeader>
               <CardTitle>Doctor Information</CardTitle>
             </CardHeader>
@@ -90,16 +125,61 @@ export default function DoctorPage() {
                     <p className="mt-1 text-lg">{response.phone}</p>
                   </div>
                 </div>
-
-                {response.appointments && response.appointments.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase">Appointments</h3>
-                    <p className="mt-1 text-lg">{response.appointments.length} appointment(s)</p>
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>
+
+          {prescriptions.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-2xl font-bold mb-4">Prescriptions Issued ({prescriptions.length})</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {prescriptions.map(prescription => (
+                  <Card key={prescription.id}>
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        {prescription.medication}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        <p>
+                          <span className="font-semibold">Dosage:</span>{' '}
+                          {prescription.dosage}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Patient:</span>{' '}
+                          {patients[prescription.patient_id] ? (
+                            <Link 
+                              to={`/patients/${prescription.patient_id}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {patients[prescription.patient_id].first_name} {patients[prescription.patient_id].last_name}
+                            </Link>
+                          ) : (
+                            `Patient ID: ${prescription.patient_id}`
+                          )}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Start Date:</span>{' '}
+                          {typeof prescription.start_date === 'number'
+                            ? new Date(prescription.start_date * 1000).toLocaleDateString()
+                            : new Date(prescription.start_date).toLocaleDateString()}
+                        </p>
+                        {prescription.end_date && (
+                          <p>
+                            <span className="font-semibold">End Date:</span>{' '}
+                            {typeof prescription.end_date === 'number'
+                              ? new Date(prescription.end_date * 1000).toLocaleDateString()
+                              : new Date(prescription.end_date).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

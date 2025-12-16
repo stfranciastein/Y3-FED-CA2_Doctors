@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import axios from "@/config/api.js";
 import { toast } from "sonner";
 
@@ -205,24 +204,19 @@ export default function AppointmentForm() {
                         </SelectContent>
                     </Select>
 
-                    <div>
-                        <Label>Appointment Date</Label>
-                        <DatePicker
-                            value={form.appointment_date}
-                            onChange={(date) => setForm({ ...form, appointment_date: date })}
-                            placeholder="Select appointment date"
-                        />
-                    </div>
+                    <DatePicker
+                        value={form.appointment_date}
+                        onChange={(date) => setForm({ ...form, appointment_date: date })}
+                        placeholder="Select appointment date"
+                    />
 
-                    <div>
-                        <Label>Appointment Time</Label>
-                        <Input
-                            type="time"
-                            value={form.appointment_time}
-                            onChange={(e) => setForm({ ...form, appointment_time: e.target.value })}
-                            required
-                        />
-                    </div>
+                    <Input
+                        type="time"
+                        value={form.appointment_time}
+                        onChange={(e) => setForm({ ...form, appointment_time: e.target.value })}
+                        placeholder="Appointment Time"
+                        required
+                    />
                     
                     <Button type="submit">{isEditMode ? 'Update' : 'Create'} Appointment</Button>
                 </div>

@@ -67,8 +67,6 @@ export default function DiagnosesIndex() {
 
     return (
         <>
-            <h1>Diagnoses</h1>
-
             <div className="flex gap-2 mb-4">
                 <Button
                     asChild

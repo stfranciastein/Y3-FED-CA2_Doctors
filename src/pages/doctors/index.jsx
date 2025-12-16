@@ -105,8 +105,6 @@ export default function DoctorsIndex() {
 
     return (
         <>
-            <h1>Doctors</h1>
-
             <div className="flex gap-2 mb-4">
                 <Button
                     asChild

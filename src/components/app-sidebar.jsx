@@ -67,6 +67,11 @@ const data = {
       url: "/diagnoses",
       icon: IconFileDescription,
     },
+    {
+      title: "Prescriptions",
+      url: "/prescriptions",
+      icon: IconFileWord,
+    },
   ],
 }
 

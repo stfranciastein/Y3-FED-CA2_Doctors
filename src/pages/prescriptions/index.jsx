@@ -82,8 +82,6 @@ export default function PrescriptionsIndex() {
 
     return (
         <>
-            <h1>Prescriptions</h1>
-
             <div className="flex gap-2 mb-4">
                 <Button
                     asChild

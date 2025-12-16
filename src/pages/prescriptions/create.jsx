@@ -30,11 +30,18 @@ export default function PrescriptionForm() {
 
     useEffect(() => {
         const fetchData = async () => {
+            const token = localStorage.getItem('token');
             try {
                 const [patientsRes, doctorsRes, diagnosesRes] = await Promise.all([
-                    axios.get('/patients'),
-                    axios.get('/doctors'),
-                    axios.get('/diagnoses')
+                    axios.get('/patients', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    axios.get('/doctors', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    axios.get('/diagnoses', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
                 ]);
                 setPatients(patientsRes.data);
                 setDoctors(doctorsRes.data);
@@ -241,7 +248,6 @@ export default function PrescriptionForm() {
                             <SelectValue placeholder="Select Diagnosis (Optional)" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">None</SelectItem>
                             {diagnoses.map(diagnosis => (
                                 <SelectItem key={diagnosis.id} value={diagnosis.id.toString()}>
                                     {diagnosis.condition} (ID: {diagnosis.id})
