@@ -93,17 +93,7 @@ export default function StatsIndex() {
     return Object.entries(months).slice(-6).map(([month, appointments]) => ({ month, appointments }));
   };
 
-  const getTopDiagnoses = () => {
-    const conditions = {};
-    stats.diagnoses.forEach(diagnosis => {
-      const condition = diagnosis.condition || 'Other';
-      conditions[condition] = (conditions[condition] || 0) + 1;
-    });
-    return Object.entries(conditions)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 5)
-      .map(([condition, count]) => ({ condition, count }));
-  };
+
 
   const getOverviewStats = () => ({
     totalPatients: stats.patients.length,
@@ -152,7 +142,6 @@ export default function StatsIndex() {
   const overviewStats = getOverviewStats();
   const doctorSpecs = getDoctorSpecialisations();
   const appointmentTrend = getAppointmentsByMonth();
-  const topDiagnoses = getTopDiagnoses();
 
   const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -370,34 +359,6 @@ export default function StatsIndex() {
                     dot={{ fill: '#8884d8' }}
                   />
                 </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Top Diagnoses Bar Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Top 5 Diagnoses</CardTitle>
-            <CardDescription>Most common conditions diagnosed</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                count: {
-                  label: "Count",
-                  color: "hsl(var(--chart-3))",
-                },
-              }}
-              className="h-[300px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={topDiagnoses}>
-                  <XAxis dataKey="condition" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="count" fill="#82ca9d" />
-                </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
