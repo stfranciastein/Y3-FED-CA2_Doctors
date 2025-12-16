@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import axios, { fetchHolidays } from '@/config/api.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
+import { BigCalendar } from "@/components/ui/big-calendar";
 import { ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import moment from 'moment';
 
 export default function StatsIndex() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function StatsIndex() {
   });
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [doctors, setDoctors] = useState({});
   const [patients, setPatients] = useState({});
   const [holidays, setHolidays] = useState([]);
@@ -112,6 +114,28 @@ export default function StatsIndex() {
     });
   };
 
+  // Convert appointments to calendar events
+  const getCalendarEvents = () => {
+    return stats.appointments.map(apt => {
+      const date = new Date(typeof apt.appointment_date === 'number' ? apt.appointment_date * 1000 : apt.appointment_date);
+      const patient = patients[apt.patient_id];
+      const doctor = doctors[apt.doctor_id];
+      
+      return {
+        id: apt.id,
+        title: patient ? `${patient.first_name} ${patient.last_name}` : `Patient ${apt.patient_id}`,
+        start: date,
+        end: new Date(date.getTime() + 30 * 60000), // 30 minutes default
+        resource: {
+          appointmentId: apt.id,
+          doctor: doctor ? `Dr. ${doctor.first_name} ${doctor.last_name}` : `Doctor ${apt.doctor_id}`,
+          patient: patient ? `${patient.first_name} ${patient.last_name}` : `Patient ${apt.patient_id}`,
+          specialisation: doctor?.specialisation
+        }
+      };
+    });
+  };
+
   // Get dates that have appointments
   const getAppointmentDates = () => {
     return stats.appointments.map(apt => {
@@ -132,7 +156,10 @@ export default function StatsIndex() {
     return holidays.map(holiday => holiday.date);
   };
 
-  const appointmentsForSelectedDate = getAppointmentsForDate(selectedDate);
+  const appointmentsForSelectedDate = selectedEvent 
+    ? [stats.appointments.find(apt => apt.id === selectedEvent.id)]
+    : getAppointmentsForDate(selectedDate);
+  const calendarEvents = getCalendarEvents();
   const appointmentDates = getAppointmentDates();
   const holidayDates = getHolidayDates();
   const holidayForSelectedDate = getHolidayForDate(selectedDate);
@@ -153,103 +180,32 @@ export default function StatsIndex() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Appointments Calendar</CardTitle>
-          <CardDescription>View appointments by date</CardDescription>
+          <CardDescription>View and manage appointments by date</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Calendar */}
-            <div className="calendar-container w-fit mb-25">
-              <style dangerouslySetInnerHTML={{
-                __html: `
-                  .calendar-container .has-appointments {
-                    position: relative;
-                  }
-                  .calendar-container .has-appointments::after {
-                    content: '●';
-                    position: absolute;
-                    top: 4px;
-                    right: 4px;
-                    font-size: 12px;
-                    color: #3b82f6;
-                    font-weight: bold;
-                    z-index: 3;
-                    text-shadow: 0 0 2px white;
-                  }
-                  .calendar-container .is-holiday {
-                    position: relative;
-                  }
-                  .calendar-container .is-holiday::before {
-                    content: '🎉';
-                    position: absolute;
-                    top: 2px;
-                    left: 2px;
-                    font-size: 10px;
-                    z-index: 3;
-                  }
-                  .calendar-container .rdp-day_selected.has-appointments::after {
-                    color: white;
-                    text-shadow: 0 0 2px rgba(0,0,0,0.5);
-                  }
-                  .calendar-container .rdp-day_selected.is-holiday::before {
-                    filter: brightness(1.2);
-                  }
-                `
-              }} />
-              <div onClick={(e) => e.preventDefault()} className="inline-block">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => {
-                    if (date) {
-                      setSelectedDate(date);
-                    }
-                  }}
-                  modifiers={{
-                    hasAppointments: appointmentDates,
-                    isHoliday: holidayDates
-                  }}
-                  modifiersStyles={{
-                    hasAppointments: { 
-                      backgroundColor: 'hsl(var(--primary))',
-                      color: 'hsl(var(--primary-foreground))',
-                      fontWeight: 'bold'
-                    },
-                    isHoliday: {
-                      backgroundColor: '#fef3c7',
-                      color: '#92400e',
-                      fontWeight: 'bold'
-                    }
-                  }}
-                  modifiersClassNames={{
-                    hasAppointments: 'has-appointments',
-                    isHoliday: 'is-holiday'
-                  }}
-                  className="rounded-md border scale-[1.35] origin-top-left"
-                  style={{ transformOrigin: 'top left' }}
-                  numberOfMonths={1}
-                />
-              </div>
-            </div>
-
-            {/* Appointments for selected date */}
-            <div>
-              {/* Holiday information */}
-              {holidayForSelectedDate && (
-                <Card className="mb-4 bg-amber-50 border-amber-200">
-                  <CardContent className="p-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">🎉</span>
-                      <div>
-                        <p className="font-medium text-amber-800">Holiday</p>
-                        <p className="text-sm text-amber-700">{holidayForSelectedDate.name}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-              {appointmentsForSelectedDate.length > 0 ? (
+          <BigCalendar 
+            events={calendarEvents}
+            holidays={holidays}
+            onSelectEvent={(event) => {
+              setSelectedEvent(event);
+              setSelectedDate(event.start);
+            }}
+            onSelectSlot={(slotInfo) => {
+              setSelectedDate(slotInfo.start);
+              setSelectedEvent(null);
+            }}
+            className="bg-background"
+          />
+          
+          {/* Selected appointment details */}
+          {(selectedEvent || appointmentsForSelectedDate.length > 0) && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-3">
+                Appointments for {moment(selectedDate).format('MMMM D, YYYY')}
+              </h3>
+              {appointmentsForSelectedDate.filter(Boolean).length > 0 ? (
                 <div className="space-y-3 max-h-80 overflow-y-auto">
-                  {appointmentsForSelectedDate.map(appointment => (
+                  {appointmentsForSelectedDate.filter(Boolean).map(appointment => (
                     <Card 
                       key={appointment.id} 
                       className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -294,7 +250,7 @@ export default function StatsIndex() {
                 </Card>
               )}
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
@@ -306,7 +262,7 @@ export default function StatsIndex() {
             <CardTitle>Doctor Specialisations</CardTitle>
             <CardDescription>Distribution of doctors by specialisation</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-x-auto">
             <ChartContainer
               config={{
                 value: {
@@ -314,7 +270,7 @@ export default function StatsIndex() {
                   color: "hsl(var(--chart-1))",
                 },
               }}
-              className="h-[300px]"
+              className="h-[300px] min-w-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -344,7 +300,7 @@ export default function StatsIndex() {
             <CardTitle>Appointment Trends</CardTitle>
             <CardDescription>Appointments over the last 6 months</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-x-auto">
             <ChartContainer
               config={{
                 appointments: {
@@ -352,7 +308,7 @@ export default function StatsIndex() {
                   color: "hsl(var(--chart-2))",
                 },
               }}
-              className="h-[300px]"
+              className="h-[300px] min-w-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={appointmentTrend}>
