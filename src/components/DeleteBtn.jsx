@@ -31,9 +31,11 @@ export default function DeleteBtn({ resource, id, itemName, onDeleteSuccess }) {
         }
 
         try {
-            // Special handling for doctors - cascade delete appointments and prescriptions
+            // Special handling for doctors and patients - cascade delete related records
             if (resource === 'doctors') {
                 await handleDoctorDelete(token);
+            } else if (resource === 'patients') {
+                await handlePatientDelete(token);
             } else {
                 // Standard delete for other resources
                 await axios.delete(`/${resource}/${id}`, {
@@ -114,6 +116,77 @@ export default function DeleteBtn({ resource, id, itemName, onDeleteSuccess }) {
             
             if (deletedItems.length > 0) {
                 toast.success(`Doctor and related records deleted: ${deletedItems.join(', ')}`);
+            }
+        } catch (error) {
+            console.error('Error in cascade delete:', error);
+            throw error; // Re-throw to be caught by main handler
+        }
+    };
+
+    // Cascade delete for patients: delete appointments, prescriptions, and diagnoses first
+    const handlePatientDelete = async (token) => {
+        const headers = { 'Authorization': `Bearer ${token}` };
+        
+        try {
+            // Fetch all appointments for this patient
+            const appointmentsResponse = await axios.get('/appointments', { headers });
+            const patientAppointments = appointmentsResponse.data.filter(
+                apt => apt.patient_id == id || apt.patient_id === parseInt(id)
+            );
+
+            // Fetch all prescriptions for this patient
+            const prescriptionsResponse = await axios.get('/prescriptions', { headers });
+            const patientPrescriptions = prescriptionsResponse.data.filter(
+                presc => presc.patient_id == id || presc.patient_id === parseInt(id)
+            );
+
+            // Fetch all diagnoses for this patient
+            const diagnosesResponse = await axios.get('/diagnoses', { headers });
+            const patientDiagnoses = diagnosesResponse.data.filter(
+                diag => diag.patient_id == id || diag.patient_id === parseInt(id)
+            );
+
+            // Delete all appointments
+            if (patientAppointments.length > 0) {
+                await Promise.all(
+                    patientAppointments.map(apt => 
+                        axios.delete(`/appointments/${apt.id}`, { headers })
+                    )
+                );
+                console.log(`Deleted ${patientAppointments.length} appointments`);
+            }
+
+            // Delete all prescriptions
+            if (patientPrescriptions.length > 0) {
+                await Promise.all(
+                    patientPrescriptions.map(presc => 
+                        axios.delete(`/prescriptions/${presc.id}`, { headers })
+                    )
+                );
+                console.log(`Deleted ${patientPrescriptions.length} prescriptions`);
+            }
+
+            // Delete all diagnoses
+            if (patientDiagnoses.length > 0) {
+                await Promise.all(
+                    patientDiagnoses.map(diag => 
+                        axios.delete(`/diagnoses/${diag.id}`, { headers })
+                    )
+                );
+                console.log(`Deleted ${patientDiagnoses.length} diagnoses`);
+            }
+
+            // Finally, delete the patient
+            await axios.delete(`/patients/${id}`, { headers });
+            
+            // Show detailed success message
+            const deletedItems = [];
+            if (patientAppointments.length > 0) deletedItems.push(`${patientAppointments.length} appointment(s)`);
+            if (patientPrescriptions.length > 0) deletedItems.push(`${patientPrescriptions.length} prescription(s)`);
+            if (patientDiagnoses.length > 0) deletedItems.push(`${patientDiagnoses.length} diagnos(es)`);
+            
+            if (deletedItems.length > 0) {
+                toast.success(`Patient and related records deleted: ${deletedItems.join(', ')}`);
             }
         } catch (error) {
             console.error('Error in cascade delete:', error);
