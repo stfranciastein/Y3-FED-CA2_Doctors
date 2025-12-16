@@ -132,7 +132,7 @@ export default function PrescriptionPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-semibold text-gray-500 uppercase">Name</h3>
-                    <Link to={`/patients/${patient.id}`} className="mt-1 text-lg text-blue-600 hover:underline block">
+                    <Link to={`/patients/${patient.id}`} className="mt-1 text-lg text-teal-600 hover:text-teal-800 hover:underline transition-colors block">
                       {patient.first_name} {patient.last_name}
                     </Link>
                   </div>
@@ -155,7 +155,7 @@ export default function PrescriptionPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-semibold text-gray-500 uppercase">Doctor</h3>
-                    <Link to={`/doctors/${doctor.id}`} className="mt-1 text-lg text-blue-600 hover:underline block">
+                    <Link to={`/doctors/${doctor.id}`} className="mt-1 text-lg text-teal-600 hover:text-teal-800 hover:underline transition-colors block">
                       Dr. {doctor.first_name} {doctor.last_name}
                     </Link>
                   </div>
@@ -177,7 +177,7 @@ export default function PrescriptionPage() {
               <CardContent>
                 <div>
                   <h3 className="text-sm font-semibold text-gray-500 uppercase">Condition</h3>
-                  <Link to={`/diagnoses/${diagnosis.id}`} className="mt-1 text-lg text-blue-600 hover:underline block">
+                  <Link to={`/diagnoses/${diagnosis.id}`} className="mt-1 text-lg text-teal-600 hover:text-teal-800 hover:underline transition-colors block">
                     {diagnosis.condition}
                   </Link>
                 </div>

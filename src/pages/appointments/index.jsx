@@ -110,16 +110,17 @@ export default function AppointmentsIndex() {
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {response.map((appointment) => (
-                        <Card key={appointment.id}>
-                            <CardHeader>
-                                <CardTitle>Appointment #{appointment.id}</CardTitle>
-                            </CardHeader>
+                        <Link key={appointment.id} to={`/appointments/${appointment.id}`} className="block">
+                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                                <CardHeader>
+                                    <CardTitle>Appointment #{appointment.id}</CardTitle>
+                                </CardHeader>
                             <CardContent>
                                 <div className="space-y-1 text-sm">
                                     <p>
                                         <span className="font-semibold">Doctor:</span>{' '}
                                         {doctors[appointment.doctor_id] ? 
-                                            <Link to={`/doctors/${appointment.doctor_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                            <Link to={`/doctors/${appointment.doctor_id}`} className="text-teal-600 hover:text-teal-800 hover:underline transition-colors">
                                                 {`Dr. ${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}`}
                                             </Link> : 
                                             `ID: ${appointment.doctor_id}`}
@@ -127,7 +128,7 @@ export default function AppointmentsIndex() {
                                     <p>
                                         <span className="font-semibold">Patient:</span>{' '}
                                         {patients[appointment.patient_id] ? 
-                                            <Link to={`/patients/${appointment.patient_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                            <Link to={`/patients/${appointment.patient_id}`} className="text-teal-600 hover:text-teal-800 hover:underline transition-colors">
                                                 {`${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}`}
                                             </Link> : 
                                             `ID: ${appointment.patient_id}`}
@@ -147,7 +148,8 @@ export default function AppointmentsIndex() {
                                 </Button>
                                 <DeleteBtn resource="appointments" id={appointment.id} itemName={`#${appointment.id}`} onDeleteSuccess={fetchAppointments} />
                             </CardFooter>
-                        </Card>
+                            </Card>
+                        </Link>
                     ))}
                 </div>
             ) : (
@@ -163,18 +165,18 @@ export default function AppointmentsIndex() {
                     </TableHeader>
                     <TableBody>
                         {response.map((appointment) => (
-                            <TableRow key={appointment.id}>
+                            <TableRow key={appointment.id} className="cursor-pointer hover:bg-muted/50" onClick={() => window.location.href = `/appointments/${appointment.id}`}>
                                 <TableCell className="font-medium">{appointment.id}</TableCell>
                                 <TableCell>
                                     {doctors[appointment.doctor_id] ? 
-                                        <Link to={`/doctors/${appointment.doctor_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                        <Link to={`/doctors/${appointment.doctor_id}`} className="text-teal-600 hover:text-teal-800 hover:underline transition-colors">
                                             {`Dr. ${doctors[appointment.doctor_id].first_name} ${doctors[appointment.doctor_id].last_name}`}
                                         </Link> : 
                                         `ID: ${appointment.doctor_id}`}
                                 </TableCell>
                                 <TableCell>
                                     {patients[appointment.patient_id] ? 
-                                        <Link to={`/patients/${appointment.patient_id}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+                                        <Link to={`/patients/${appointment.patient_id}`} className="text-teal-600 hover:text-teal-800 hover:underline transition-colors">
                                             {`${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}`}
                                         </Link> : 
                                         `ID: ${appointment.patient_id}`}

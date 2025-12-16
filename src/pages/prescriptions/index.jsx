@@ -111,18 +111,19 @@ export default function PrescriptionsIndex() {
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {response.map((prescription) => (
-                        <Card key={prescription.id}>
-                            <CardHeader>
-                                <CardTitle>{prescription.medication}</CardTitle>
-                                <CardDescription>Prescription ID: {prescription.id}</CardDescription>
-                            </CardHeader>
+                        <Link key={prescription.id} to={`/prescriptions/${prescription.id}`} className="block">
+                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                                <CardHeader>
+                                    <CardTitle>{prescription.medication}</CardTitle>
+                                    <CardDescription>Prescription ID: {prescription.id}</CardDescription>
+                                </CardHeader>
                             <CardContent>
                                 <div className="space-y-1 text-sm">
                                     <p><span className="font-semibold">Dosage:</span> {prescription.dosage}</p>
                                     <p>
                                         <span className="font-semibold">Patient:</span>{' '}
                                         {patients[prescription.patient_id] ? (
-                                            <Link to={`/patients/${prescription.patient_id}`} className="text-blue-600 hover:underline">
+                                            <Link to={`/patients/${prescription.patient_id}`} className="text-teal-600 hover:text-teal-800 hover:underline transition-colors">
                                                 {patients[prescription.patient_id].first_name} {patients[prescription.patient_id].last_name}
                                             </Link>
                                         ) : (
@@ -132,7 +133,7 @@ export default function PrescriptionsIndex() {
                                     <p>
                                         <span className="font-semibold">Doctor:</span>{' '}
                                         {doctors[prescription.doctor_id] ? (
-                                            <Link to={`/doctors/${prescription.doctor_id}`} className="text-blue-600 hover:underline">
+                                            <Link to={`/doctors/${prescription.doctor_id}`} className="text-teal-600 hover:text-teal-800 hover:underline transition-colors">
                                                 Dr. {doctors[prescription.doctor_id].first_name} {doctors[prescription.doctor_id].last_name}
                                             </Link>
                                         ) : (
@@ -154,7 +155,8 @@ export default function PrescriptionsIndex() {
                                 </Button>
                                 <DeleteBtn resource="prescriptions" id={prescription.id} itemName={prescription.medication} onDeleteSuccess={fetchPrescriptions} />
                             </CardFooter>
-                        </Card>
+                            </Card>
+                        </Link>
                     ))}
                 </div>
             ) : (
@@ -173,13 +175,13 @@ export default function PrescriptionsIndex() {
                     </TableHeader>
                     <TableBody>
                         {response.map((prescription) => (
-                            <TableRow key={prescription.id}>
+                            <TableRow key={prescription.id} className="cursor-pointer hover:bg-muted/50" onClick={() => window.location.href = `/prescriptions/${prescription.id}`}>
                                 <TableCell className="font-medium">{prescription.id}</TableCell>
                                 <TableCell>{prescription.medication}</TableCell>
                                 <TableCell>{prescription.dosage}</TableCell>
                                 <TableCell>
                                     {patients[prescription.patient_id] ? (
-                                        <Link to={`/patients/${prescription.patient_id}`} className="text-blue-600 hover:underline">
+                                        <Link to={`/patients/${prescription.patient_id}`} className="text-teal-600 hover:text-teal-800 hover:underline transition-colors">
                                             {patients[prescription.patient_id].first_name} {patients[prescription.patient_id].last_name}
                                         </Link>
                                     ) : (
@@ -188,7 +190,7 @@ export default function PrescriptionsIndex() {
                                 </TableCell>
                                 <TableCell>
                                     {doctors[prescription.doctor_id] ? (
-                                        <Link to={`/doctors/${prescription.doctor_id}`} className="text-blue-600 hover:underline">
+                                        <Link to={`/doctors/${prescription.doctor_id}`} className="text-teal-600 hover:text-teal-800 hover:underline transition-colors">
                                             Dr. {doctors[prescription.doctor_id].first_name} {doctors[prescription.doctor_id].last_name}
                                         </Link>
                                     ) : (

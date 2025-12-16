@@ -79,11 +79,12 @@ export default function PatientsIndex() {
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {response.map((patient) => (
-                        <Card key={patient.id}>
-                            <CardHeader>
-                                <CardTitle>{patient.first_name} {patient.last_name}</CardTitle>
-                                <CardDescription>Patient ID: {patient.id}</CardDescription>
-                            </CardHeader>
+                        <Link key={patient.id} to={`/patients/${patient.id}`} className="block">
+                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                                <CardHeader>
+                                    <CardTitle>{patient.first_name} {patient.last_name}</CardTitle>
+                                    <CardDescription>Patient ID: {patient.id}</CardDescription>
+                                </CardHeader>
                             <CardContent>
                                 <div className="space-y-1 text-sm">
                                     <p><span className="font-semibold">Email:</span> {patient.email}</p>
@@ -106,7 +107,8 @@ export default function PatientsIndex() {
                                 </Button>
                                 <DeleteBtn resource="patients" id={patient.id} itemName={`${patient.first_name} ${patient.last_name}`} onDeleteSuccess={fetchPatients} />
                             </CardFooter>
-                        </Card>
+                            </Card>
+                        </Link>
                     ))}
                 </div>
             ) : (
@@ -125,7 +127,7 @@ export default function PatientsIndex() {
                     </TableHeader>
                     <TableBody>
                         {response.map((patient) => (
-                            <TableRow key={patient.id}>
+                            <TableRow key={patient.id} className="cursor-pointer hover:bg-muted/50" onClick={() => window.location.href = `/patients/${patient.id}`}>
                                 <TableCell className="font-medium">{patient.id}</TableCell>
                                 <TableCell>{patient.first_name}</TableCell>
                                 <TableCell>{patient.last_name}</TableCell>

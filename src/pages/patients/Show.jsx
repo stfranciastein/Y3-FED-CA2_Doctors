@@ -173,9 +173,10 @@ export default function PatientPage() {
                   {appointments.length > 0 ? (
                     <div className="space-y-3">
                       {appointments.map(appointment => (
-                        <div key={appointment.id} className="border rounded-lg p-4 bg-white shadow-sm">
-                          <div className="flex items-start justify-between mb-2">
-                            <h3 className="font-semibold text-lg">Appointment #{appointment.id}</h3>
+                        <Link key={appointment.id} to={`/appointments/${appointment.id}`} className="block">
+                          <div className="border rounded-lg p-4 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+                            <div className="flex items-start justify-between mb-2">
+                              <h3 className="font-semibold text-lg">Appointment #{appointment.id}</h3>
                             <span className="text-sm text-gray-500">
                               {typeof appointment.appointment_date === 'number'
                                 ? new Date(appointment.appointment_date * 1000).toLocaleString()
@@ -189,7 +190,7 @@ export default function PatientPage() {
                                 {doctors[appointment.doctor_id] ? (
                                   <Link 
                                     to={`/doctors/${appointment.doctor_id}`}
-                                    className="text-blue-600 hover:underline"
+                                    className="text-teal-600 hover:text-teal-800 hover:underline transition-colors"
                                   >
                                     Dr. {doctors[appointment.doctor_id].first_name} {doctors[appointment.doctor_id].last_name}
                                   </Link>
@@ -202,7 +203,8 @@ export default function PatientPage() {
                               )}
                             </div>
                           </div>
-                        </div>
+                          </div>
+                        </Link>
                       ))}
                     </div>
                   ) : (
@@ -214,9 +216,10 @@ export default function PatientPage() {
                   {prescriptions.length > 0 ? (
                     <div className="space-y-3">
                       {prescriptions.map(prescription => (
-                        <div key={prescription.id} className="border rounded-lg p-4 bg-white shadow-sm">
-                          <div className="flex items-start justify-between mb-2">
-                            <h3 className="font-semibold text-lg">{prescription.medication}</h3>
+                        <Link key={prescription.id} to={`/prescriptions/${prescription.id}`} className="block">
+                          <div className="border rounded-lg p-4 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+                            <div className="flex items-start justify-between mb-2">
+                              <h3 className="font-semibold text-lg">{prescription.medication}</h3>
                             <span className="text-sm text-gray-500">
                               {typeof prescription.start_date === 'number'
                                 ? new Date(prescription.start_date * 1000).toLocaleDateString()
@@ -231,7 +234,7 @@ export default function PatientPage() {
                                 {doctors[prescription.doctor_id] ? (
                                   <Link 
                                     to={`/doctors/${prescription.doctor_id}`}
-                                    className="text-blue-600 hover:underline"
+                                    className="text-teal-600 hover:text-teal-800 hover:underline transition-colors"
                                   >
                                     Dr. {doctors[prescription.doctor_id].first_name} {doctors[prescription.doctor_id].last_name}
                                   </Link>
@@ -244,7 +247,7 @@ export default function PatientPage() {
                                   <strong>Diagnosis:</strong>{' '}
                                   <Link 
                                     to={`/diagnoses/${prescription.diagnosis_id}`}
-                                    className="text-blue-600 hover:underline"
+                                    className="text-teal-600 hover:text-teal-800 hover:underline transition-colors"
                                   >
                                     {diagnoses[prescription.diagnosis_id].description}
                                   </Link>
@@ -259,7 +262,8 @@ export default function PatientPage() {
                               </span>
                             )}
                           </div>
-                        </div>
+                          </div>
+                        </Link>
                       ))}
                     </div>
                   ) : (

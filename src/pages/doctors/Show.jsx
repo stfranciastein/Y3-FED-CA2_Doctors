@@ -134,9 +134,10 @@ export default function DoctorPage() {
               <h2 className="text-2xl font-bold mb-4">Prescriptions Issued ({prescriptions.length})</h2>
               <div className="space-y-3">
                 {prescriptions.map(prescription => (
-                  <div key={prescription.id} className="border rounded-lg p-4 bg-white shadow-sm">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-lg">{prescription.medication}</h3>
+                  <Link key={prescription.id} to={`/prescriptions/${prescription.id}`} className="block">
+                    <div className="border rounded-lg p-4 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-lg">{prescription.medication}</h3>
                       <span className="text-sm text-gray-500">
                         {typeof prescription.start_date === 'number'
                           ? new Date(prescription.start_date * 1000).toLocaleDateString()
@@ -151,7 +152,7 @@ export default function DoctorPage() {
                           {patients[prescription.patient_id] ? (
                             <Link 
                               to={`/patients/${prescription.patient_id}`}
-                              className="text-blue-600 hover:underline"
+                              className="text-teal-600 hover:text-teal-800 hover:underline transition-colors"
                             >
                               {patients[prescription.patient_id].first_name} {patients[prescription.patient_id].last_name}
                             </Link>
@@ -168,7 +169,8 @@ export default function DoctorPage() {
                         </span>
                       )}
                     </div>
-                  </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>

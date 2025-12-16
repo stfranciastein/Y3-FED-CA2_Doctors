@@ -252,13 +252,13 @@ export default function StatsIndex() {
                   {appointmentsForSelectedDate.map(appointment => (
                     <Card 
                       key={appointment.id} 
-                      className="bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
                       onClick={() => navigate(`/appointments/${appointment.id}`)}
                     >
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-center">
                           <CardTitle className="text-base">Appointment #{appointment.id}</CardTitle>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-muted-foreground">
                             {new Date(typeof appointment.appointment_date === 'number' 
                               ? appointment.appointment_date * 1000 
                               : appointment.appointment_date
@@ -267,7 +267,7 @@ export default function StatsIndex() {
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0">
-                        <div className="text-sm text-gray-600 space-y-1">
+                        <div className="text-sm text-muted-foreground space-y-1">
                           <p>
                             <strong>Patient:</strong> {patients[appointment.patient_id] 
                               ? `${patients[appointment.patient_id].first_name} ${patients[appointment.patient_id].last_name}`
@@ -287,9 +287,9 @@ export default function StatsIndex() {
                   ))}
                 </div>
               ) : (
-                <Card className="bg-gray-50">
+                <Card>
                   <CardContent className="text-center py-8">
-                    <p className="text-gray-500">No appointments on this date</p>
+                    <p className="text-muted-foreground">No appointments on this date</p>
                   </CardContent>
                 </Card>
               )}

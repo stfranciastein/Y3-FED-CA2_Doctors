@@ -117,10 +117,10 @@ export default function Home() {
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <Tabs defaultValue="login" className="w-full">
                             <TabsList className="grid w-full grid-cols-2 bg-transparent border-none">
-                                <TabsTrigger value="login" className={`transition-all duration-300 ease-in-out ${isDarkMode ? 'bg-slate-700/60 text-white data-[state=active]:bg-slate-800 data-[state=active]:text-teal-400' : 'bg-teal-800/60 text-white data-[state=active]:bg-white data-[state=active]:text-teal-600'}`}>
+                                <TabsTrigger value="login" className={`transition-all duration-300 ease-in-out ${isDarkMode ? 'bg-slate-700/60 text-white data-[state=active]:bg-slate-800 data-[state=active]:text-teal-400' : 'bg-teal-800/60 text-white data-[state=active]:bg-teal-100 data-[state=active]:text-teal-800'}`}>
                                     Login
                                 </TabsTrigger>
-                                <TabsTrigger value="signup" className={`transition-all duration-300 ease-in-out ${isDarkMode ? 'bg-slate-700/60 text-white data-[state=active]:bg-slate-800 data-[state=active]:text-teal-400' : 'bg-teal-800/60 text-white data-[state=active]:bg-white data-[state=active]:text-teal-600'}`}>
+                                <TabsTrigger value="signup" className={`transition-all duration-300 ease-in-out ${isDarkMode ? 'bg-slate-700/60 text-white data-[state=active]:bg-slate-800 data-[state=active]:text-teal-400' : 'bg-teal-800/60 text-white data-[state=active]:bg-teal-100 data-[state=active]:text-teal-800'}`}>
                                     Sign Up
                                 </TabsTrigger>
                             </TabsList>

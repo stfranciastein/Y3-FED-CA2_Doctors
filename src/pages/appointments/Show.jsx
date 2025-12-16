@@ -85,7 +85,7 @@ export default function AppointmentPage() {
               <div>
                 <h3 className="text-sm font-semibold text-gray-500 uppercase">Doctor</h3>
                 {doctor ? (
-                  <Link to={`/doctors/${doctor.id}`} className="mt-1 text-lg text-blue-600 hover:underline block">
+                  <Link to={`/doctors/${doctor.id}`} className="mt-1 text-lg text-teal-600 hover:text-teal-800 hover:underline transition-colors block">
                     Dr. {doctor.first_name} {doctor.last_name}
                     {doctor.specialisation && <span className="text-sm text-gray-500 block">{doctor.specialisation}</span>}
                   </Link>
@@ -97,7 +97,7 @@ export default function AppointmentPage() {
               <div>
                 <h3 className="text-sm font-semibold text-gray-500 uppercase">Patient</h3>
                 {patient ? (
-                  <Link to={`/patients/${patient.id}`} className="mt-1 text-lg text-blue-600 hover:underline block">
+                  <Link to={`/patients/${patient.id}`} className="mt-1 text-lg text-teal-600 hover:text-teal-800 hover:underline transition-colors block">
                     {patient.first_name} {patient.last_name}
                     {patient.email && <span className="text-sm text-gray-500 block">{patient.email}</span>}
                   </Link>
