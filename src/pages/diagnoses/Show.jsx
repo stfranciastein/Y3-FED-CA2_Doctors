@@ -4,8 +4,10 @@ import axios from '@/config/api.js';
 import { Button } from '@/components/ui/button';
 import { Pencil } from 'lucide-react';
 import DeleteBtn from '@/components/DeleteBtn';
+import { useDarkMode } from '@/hooks/useDarkMode';
 
 export default function DiagnosisPage() {
+  const { isDarkMode } = useDarkMode();
   const [response, setResponse] = useState(null);
   const [patient, setPatient] = useState(null);
   const { id } = useParams();
@@ -38,9 +40,9 @@ export default function DiagnosisPage() {
 
   const formatDate = (dateValue) => {
     if (typeof dateValue === 'number') {
-        return new Date(dateValue * 1000).toLocaleString();
+        return new Date(dateValue * 1000).toLocaleDateString();
     }
-    return new Date(dateValue).toLocaleString();
+    return new Date(dateValue).toLocaleDateString();
   };
   
   return (
@@ -74,8 +76,8 @@ export default function DiagnosisPage() {
             </div>
             
             <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Condition</h3>
-              <p className="text-lg p-4 bg-gray-50 rounded border">{response.condition}</p>
+              <h3 className={`text-sm font-semibold uppercase mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Condition</h3>
+              <p className={`text-lg p-4 rounded border ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-gray-50 border-gray-200'}`}>{response.condition}</p>
             </div>
             
             {patient && (

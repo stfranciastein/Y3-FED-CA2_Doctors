@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pencil } from 'lucide-react';
 import DeleteBtn from '@/components/DeleteBtn';
+import { useDarkMode } from '@/hooks/useDarkMode';
 
 export default function PatientPage() {
+  const { isDarkMode } = useDarkMode();
   const [response, setResponse] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState({});
@@ -174,16 +176,16 @@ export default function PatientPage() {
                     <div className="space-y-3">
                       {appointments.map(appointment => (
                         <Link key={appointment.id} to={`/appointments/${appointment.id}`} className="block">
-                          <div className="border rounded-lg p-4 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+                          <div className={`border rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'}`}>
                             <div className="flex items-start justify-between mb-2">
                               <h3 className="font-semibold text-lg">Appointment #{appointment.id}</h3>
-                            <span className="text-sm text-gray-500">
+                            <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                               {typeof appointment.appointment_date === 'number'
                                 ? new Date(appointment.appointment_date * 1000).toLocaleString()
                                 : new Date(appointment.appointment_date).toLocaleString()}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between text-sm text-gray-600">
+                          <div className={`flex items-center justify-between text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             <div className="flex items-center gap-4">
                               <span>
                                 <strong>Doctor:</strong>{' '}
@@ -217,16 +219,16 @@ export default function PatientPage() {
                     <div className="space-y-3">
                       {prescriptions.map(prescription => (
                         <Link key={prescription.id} to={`/prescriptions/${prescription.id}`} className="block">
-                          <div className="border rounded-lg p-4 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow">
+                          <div className={`border rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'}`}>
                             <div className="flex items-start justify-between mb-2">
                               <h3 className="font-semibold text-lg">{prescription.medication}</h3>
-                            <span className="text-sm text-gray-500">
+                            <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                               {typeof prescription.start_date === 'number'
                                 ? new Date(prescription.start_date * 1000).toLocaleDateString()
                                 : new Date(prescription.start_date).toLocaleDateString()}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between text-sm text-gray-600">
+                          <div className={`flex items-center justify-between text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             <div className="flex items-center gap-4">
                               <span><strong>Dosage:</strong> {prescription.dosage}</span>
                               <span>
@@ -255,7 +257,7 @@ export default function PatientPage() {
                               )}
                             </div>
                             {prescription.end_date && (
-                              <span className="text-gray-500">
+                              <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
                                 Ends: {typeof prescription.end_date === 'number'
                                   ? new Date(prescription.end_date * 1000).toLocaleDateString()
                                   : new Date(prescription.end_date).toLocaleDateString()}

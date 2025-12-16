@@ -109,7 +109,7 @@ export default function Home() {
                     <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full shadow-2xl ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
                         <Stethoscope className={`w-12 h-12 ${isDarkMode ? 'text-teal-400' : 'text-teal-600'}`} />
                     </div>
-                    <h1 className="text-4xl font-bold text-white">IADT Medical</h1>
+                    <h1 className="text-4xl font-bold text-white" style={{fontFamily: 'Rubik, sans-serif'}}>IADT Medical</h1>
                 </div>
 
                 {/* Login/Register Forms */}
