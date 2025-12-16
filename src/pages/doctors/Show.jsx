@@ -39,9 +39,14 @@ export default function DoctorPage() {
           }
         });
         console.log('All Prescriptions:', response.data);
+        console.log('Looking for doctor_id:', parseInt(id));
         
-        // Filter prescriptions for this doctor
-        const doctorPrescriptions = response.data.filter(presc => presc.doctor_id === parseInt(id));
+        // Filter prescriptions for this doctor - check both number and string
+        const doctorPrescriptions = response.data.filter(presc => {
+          console.log('Prescription doctor_id:', presc.doctor_id, 'Type:', typeof presc.doctor_id);
+          return presc.doctor_id == id || presc.doctor_id === parseInt(id);
+        });
+        console.log('Filtered prescriptions:', doctorPrescriptions);
         setPrescriptions(doctorPrescriptions);
         
         // Fetch patient details for each prescription
@@ -81,6 +86,9 @@ export default function DoctorPage() {
     return '';
   };
   
+  console.log('Patients mapping:', patients);
+  console.log('Prescriptions to render:', prescriptions);
+
   return (
     <div>
       {response && (
