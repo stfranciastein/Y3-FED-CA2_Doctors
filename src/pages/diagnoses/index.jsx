@@ -100,8 +100,7 @@ export default function DiagnosesIndex() {
                             ? new Date(diagnosis.diagnosis_date * 1000).toLocaleDateString()
                             : new Date(diagnosis.diagnosis_date).toLocaleDateString();
                         return (
-                        <Link key={diagnosis.id} to={`/diagnoses/${diagnosis.id}`} className="block">
-                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                            <Card key={diagnosis.id}>
                                 <CardHeader>
                                     <CardTitle>Diagnosis #{diagnosis.id}</CardTitle>
                                     <CardDescription className="line-clamp-2">{diagnosis.condition}</CardDescription>
@@ -132,7 +131,6 @@ export default function DiagnosesIndex() {
                                 <DeleteBtn resource="diagnoses" id={diagnosis.id} itemName={`#${diagnosis.id}`} onDeleteSuccess={fetchDiagnoses} />
                             </CardFooter>
                             </Card>
-                        </Link>
                     )})}
                 </div>
             ) : (
@@ -152,7 +150,7 @@ export default function DiagnosesIndex() {
                                 ? new Date(diagnosis.diagnosis_date * 1000).toLocaleDateString()
                                 : new Date(diagnosis.diagnosis_date).toLocaleDateString();
                             return (
-                            <TableRow key={diagnosis.id} className="cursor-pointer hover:bg-muted/50" onClick={() => window.location.href = `/diagnoses/${diagnosis.id}`}>
+                            <TableRow key={diagnosis.id}>
                                 <TableCell className="font-medium">{diagnosis.id}</TableCell>
                                 <TableCell className="max-w-md truncate">{diagnosis.condition}</TableCell>
                                 <TableCell>

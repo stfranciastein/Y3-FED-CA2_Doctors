@@ -126,7 +126,7 @@ export default function AppointmentForm() {
             console.log(`Appointment ${isEditMode ? 'updated' : 'created'}:`, response.data);
             
             toast.success(`Appointment ${isEditMode ? 'updated' : 'created'} successfully!`);
-            navigate(`/appointments/${response.data.id}`);
+            navigate(`/appointments/${isEditMode ? id : response.data.id}`);
             
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} appointment:`, error);

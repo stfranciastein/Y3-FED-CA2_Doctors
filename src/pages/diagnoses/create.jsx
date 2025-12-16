@@ -116,7 +116,7 @@ export default function DiagnosisForm() {
             console.log(`Diagnosis ${isEditMode ? 'updated' : 'created'}:`, response.data);
             
             toast.success(`Diagnosis ${isEditMode ? 'updated' : 'created'} successfully!`);
-            navigate(`/diagnoses/${response.data.id}`);
+            navigate(`/diagnoses/${isEditMode ? id : response.data.id}`);
             
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} diagnosis:`, error);

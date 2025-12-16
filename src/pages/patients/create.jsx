@@ -137,7 +137,7 @@ export default function PatientForm() {
             console.log(`Patient ${isEditMode ? 'updated' : 'created'}:`, response.data);
             
             toast.success(`Patient ${isEditMode ? 'updated' : 'created'} successfully!`);
-            navigate(`/patients/${response.data.id}`);
+            navigate(`/patients/${isEditMode ? id : response.data.id}`);
             
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} patient:`, error);

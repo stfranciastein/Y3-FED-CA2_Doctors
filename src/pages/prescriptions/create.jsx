@@ -157,7 +157,7 @@ export default function PrescriptionForm() {
             console.log(`Prescription ${isEditMode ? 'updated' : 'created'}:`, response.data);
             
             toast.success(`Prescription ${isEditMode ? 'updated' : 'created'} successfully!`);
-            navigate(`/prescriptions/${response.data.id}`);
+            navigate(`/prescriptions/${isEditMode ? id : response.data.id}`);
             
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} prescription:`, error);

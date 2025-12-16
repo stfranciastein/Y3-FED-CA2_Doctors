@@ -110,8 +110,7 @@ export default function AppointmentsIndex() {
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {response.map((appointment) => (
-                        <Link key={appointment.id} to={`/appointments/${appointment.id}`} className="block">
-                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                            <Card key={appointment.id}>
                                 <CardHeader>
                                     <CardTitle>Appointment #{appointment.id}</CardTitle>
                                 </CardHeader>
@@ -149,7 +148,6 @@ export default function AppointmentsIndex() {
                                 <DeleteBtn resource="appointments" id={appointment.id} itemName={`#${appointment.id}`} onDeleteSuccess={fetchAppointments} />
                             </CardFooter>
                             </Card>
-                        </Link>
                     ))}
                 </div>
             ) : (
@@ -165,7 +163,7 @@ export default function AppointmentsIndex() {
                     </TableHeader>
                     <TableBody>
                         {response.map((appointment) => (
-                            <TableRow key={appointment.id} className="cursor-pointer hover:bg-muted/50" onClick={() => window.location.href = `/appointments/${appointment.id}`}>
+                            <TableRow key={appointment.id}>
                                 <TableCell className="font-medium">{appointment.id}</TableCell>
                                 <TableCell>
                                     {doctors[appointment.doctor_id] ? 

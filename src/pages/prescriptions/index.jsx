@@ -111,8 +111,7 @@ export default function PrescriptionsIndex() {
             {viewMode === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {response.map((prescription) => (
-                        <Link key={prescription.id} to={`/prescriptions/${prescription.id}`} className="block">
-                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                            <Card key={prescription.id}>
                                 <CardHeader>
                                     <CardTitle>{prescription.medication}</CardTitle>
                                     <CardDescription>Prescription ID: {prescription.id}</CardDescription>
@@ -156,7 +155,6 @@ export default function PrescriptionsIndex() {
                                 <DeleteBtn resource="prescriptions" id={prescription.id} itemName={prescription.medication} onDeleteSuccess={fetchPrescriptions} />
                             </CardFooter>
                             </Card>
-                        </Link>
                     ))}
                 </div>
             ) : (
@@ -175,7 +173,7 @@ export default function PrescriptionsIndex() {
                     </TableHeader>
                     <TableBody>
                         {response.map((prescription) => (
-                            <TableRow key={prescription.id} className="cursor-pointer hover:bg-muted/50" onClick={() => window.location.href = `/prescriptions/${prescription.id}`}>
+                            <TableRow key={prescription.id}>
                                 <TableCell className="font-medium">{prescription.id}</TableCell>
                                 <TableCell>{prescription.medication}</TableCell>
                                 <TableCell>{prescription.dosage}</TableCell>

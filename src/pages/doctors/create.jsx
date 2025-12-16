@@ -113,7 +113,7 @@ export default function DoctorForm() {
             console.log(`Doctor ${isEditMode ? 'updated' : 'created'}:`, response.data);
             
             toast.success(`Doctor ${isEditMode ? 'updated' : 'created'} successfully!`);
-            navigate(`/doctors/${response.data.id}`);
+            navigate(`/doctors/${isEditMode ? id : response.data.id}`);
             
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} doctor:`, error);
