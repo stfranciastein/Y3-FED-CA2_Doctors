@@ -52,7 +52,7 @@ export default function LoginForm() {
     <>
     {/* The purpose of this form is to allow users to log in to their accounts.
     In order to submit things to the API it expects a JSON which is what this submits. */}
-      <Card className={`w-full backdrop-blur ${isDarkMode ? 'bg-slate-800/95 border-slate-700' : 'bg-white/95 border-white/20'}`}>
+      <Card className={`w-full ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-white/20'}`}>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>

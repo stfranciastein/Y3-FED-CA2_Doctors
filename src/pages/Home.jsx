@@ -130,7 +130,7 @@ export default function Home() {
                             </TabsContent>
 
                             <TabsContent value="signup">
-                                <Card className={`w-full backdrop-blur ${isDarkMode ? 'bg-slate-800/95 border-slate-700' : 'bg-white/95 border-white/20'}`}>
+                                <Card className={`w-full ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-white/20'}`}>
                                     <CardHeader>
                                         <CardTitle>Create an account</CardTitle>
                                         <CardDescription>
