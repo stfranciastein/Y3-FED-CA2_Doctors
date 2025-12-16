@@ -14,22 +14,32 @@ import {
 
 import DeleteBtn from '@/components/DeleteBtn';
 
-// import {
-//   Card,
-//   CardAction,
-//   CardContent,
-//   CardDescription,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil } from 'lucide-react';
+import { Eye, Pencil, Grid, List } from 'lucide-react';
 
 export default function DoctorsIndex() {
 // Originally, this const used doctors, response is used to make it easy to reuse this code later for other API requests.
   const [response, setResponse] = useState([]);
+  const [viewMode, setViewMode] = useState(() => {
+    // Load saved view mode from localStorage, default to 'table'
+    return localStorage.getItem('doctorsViewMode') || 'table';
+  });
+
+  // Save view mode preference whenever it changes
+  const toggleViewMode = () => {
+    const newMode = viewMode === 'table' ? 'cards' : 'table';
+    setViewMode(newMode);
+    localStorage.setItem('doctorsViewMode', newMode);
+  };
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -106,51 +116,96 @@ export default function DoctorsIndex() {
         <>
             <h1>Doctors</h1>
 
-            <Button
-            asChild
-            variant='outline'
-            className='mb-4 mr-auto block'
-            >
-                <Link to="/doctors/create">Add Doctor</Link>
-            </Button>
+            <div className="flex gap-2 mb-4">
+                <Button
+                    asChild
+                    variant='outline'
+                >
+                    <Link to="/doctors/create">Add Doctor</Link>
+                </Button>
+                
+                <Button
+                    variant='outline'
+                    onClick={toggleViewMode}
+                >
+                    {viewMode === 'table' ? (
+                        <>
+                            <Grid size={18} className="mr-2" />
+                            Cards
+                        </>
+                    ) : (
+                        <>
+                            <List size={18} className="mr-2" />
+                            Table
+                        </>
+                    )}
+                </Button>
+            </div>
 
-            {/* {doctorCards} */}
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                    <TableHead className="w-[100px]">ID</TableHead>
-                    <TableHead>First Name</TableHead>
-                    <TableHead>Last Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Specialisation</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
+            {viewMode === 'cards' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {response.map((doctor) => (
-                        <TableRow key={doctor.id}>
-                            <TableCell className="font-medium">{doctor.id}</TableCell>
-                            <TableCell>{doctor.first_name}</TableCell>
-                            <TableCell>{doctor.last_name}</TableCell>
-                            <TableCell>{doctor.email}</TableCell>
-                            <TableCell>{doctor.phone}</TableCell>
-                            <TableCell>{doctor.specialisation}</TableCell>
-                            <TableCell className="text-right">
-                                <div className="flex gap-2 justify-end">
-                                <Button asChild variant="outline" size="sm">
-                                    <Link to={`/doctors/${doctor.id}`}><Eye size={18} /></Link>
+                        <Card key={doctor.id}>
+                            <CardHeader>
+                                <CardTitle>{doctor.first_name} {doctor.last_name}</CardTitle>
+                                <CardDescription>{doctor.specialisation}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-1 text-sm">
+                                    <p><span className="font-semibold">Email:</span> {doctor.email}</p>
+                                    <p><span className="font-semibold">Phone:</span> {doctor.phone}</p>
+                                </div>
+                            </CardContent>
+                            <CardFooter className="flex gap-2">
+                                <Button asChild variant='outline' size="sm">
+                                    <Link to={`/doctors/${doctor.id}`}><Eye size={18} className="mr-1" /> View</Link>
                                 </Button>
-                                <Button asChild variant="outline" size="sm">
-                                    <Link to={`/doctors/${doctor.id}/edit`}><Pencil size={18} /></Link>
+                                <Button asChild variant='outline' size="sm">
+                                    <Link to={`/doctors/${doctor.id}/edit`}><Pencil size={18} className="mr-1" /> Edit</Link>
                                 </Button>
                                 <DeleteBtn resource="doctors" id={doctor.id} />
-                                </div>
-                            </TableCell>
-                        </TableRow>
+                            </CardFooter>
+                        </Card>
                     ))}
-                </TableBody>
-            </Table>
+                </div>
+            ) : (
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead className="w-[100px]">ID</TableHead>
+                        <TableHead>First Name</TableHead>
+                        <TableHead>Last Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Specialisation</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {response.map((doctor) => (
+                            <TableRow key={doctor.id}>
+                                <TableCell className="font-medium">{doctor.id}</TableCell>
+                                <TableCell>{doctor.first_name}</TableCell>
+                                <TableCell>{doctor.last_name}</TableCell>
+                                <TableCell>{doctor.email}</TableCell>
+                                <TableCell>{doctor.phone}</TableCell>
+                                <TableCell>{doctor.specialisation}</TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex gap-2 justify-end">
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link to={`/doctors/${doctor.id}`}><Eye size={18} /></Link>
+                                    </Button>
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link to={`/doctors/${doctor.id}/edit`}><Pencil size={18} /></Link>
+                                    </Button>
+                                    <DeleteBtn resource="doctors" id={doctor.id} />
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
         </>
     );
 }
