@@ -25,15 +25,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Eye, Pencil } from 'lucide-react';
 import { useViewMode } from '@/hooks/useViewMode';
+import { useDataList } from '@/hooks/useDataList';
 
 export default function AppointmentsIndex() {
   const [response, setResponse] = useState([]);
   const [doctors, setDoctors] = useState({});
   const [patients, setPatients] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('patient_name');
-  const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('appointmentsViewMode');
+  const { searchTerm, setSearchTerm, sortField, sortOrder, handleSortChange } = useDataList('appointments', 'patient_name', 'asc');
 
   const sortOptions = [
     { value: 'patient_name', label: 'Patient Name' },
@@ -122,11 +121,6 @@ export default function AppointmentsIndex() {
         return 0;
     }
   });
-
-  const handleSortChange = (field, order) => {
-    setSortField(field);
-    setSortOrder(order);
-  };
 
     return (
         <>

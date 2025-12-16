@@ -27,14 +27,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Eye, Pencil } from 'lucide-react';
 import { useViewMode } from '@/hooks/useViewMode';
+import { useDataList } from '@/hooks/useDataList';
 
 export default function DoctorsIndex() {
 // Originally, this const used doctors, response is used to make it easy to reuse this code later for other API requests.
   const [response, setResponse] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('name');
-  const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('doctorsViewMode');
+  const { searchTerm, setSearchTerm, sortField, sortOrder, handleSortChange } = useDataList('doctors', 'name', 'asc');
 
   const sortOptions = [
     { value: 'name', label: 'Name' },
@@ -164,11 +163,6 @@ export default function DoctorsIndex() {
           : compareB - compareA;
       }
     });
-
-    const handleSortChange = (field, order) => {
-      setSortField(field);
-      setSortOrder(order);
-    };
 
     return (
         <>

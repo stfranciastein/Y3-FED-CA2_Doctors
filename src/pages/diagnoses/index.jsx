@@ -25,14 +25,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Eye, Pencil } from 'lucide-react';
 import { useViewMode } from '@/hooks/useViewMode';
+import { useDataList } from '@/hooks/useDataList';
 
 export default function DiagnosesIndex() {
   const [response, setResponse] = useState([]);
   const [patients, setPatients] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('condition');
-  const [sortOrder, setSortOrder] = useState('asc');
   const { viewMode, toggleViewMode } = useViewMode('diagnosesViewMode');
+  const { searchTerm, setSearchTerm, sortField, sortOrder, handleSortChange } = useDataList('diagnoses', 'condition', 'asc');
 
   const sortOptions = [
     { value: 'condition', label: 'Condition' },
@@ -106,11 +105,6 @@ export default function DiagnosesIndex() {
         return 0;
     }
   });
-
-  const handleSortChange = (field, order) => {
-    setSortField(field);
-    setSortOrder(order);
-  };
 
     return (
         <>
