@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import axios from "@/config/api.js";
 import { toast } from "sonner";
 
@@ -12,16 +14,26 @@ export default function AppointmentForm() {
     const { id } = useParams();
     const isEditMode = !!id;
 
-    const [form, setForm] = useState({
-        doctor_id: "",
-        patient_id: "",
-        appointment_date: "",
-        appointment_time: "",
+    const { 
+        register, 
+        handleSubmit, 
+        setValue, 
+        watch, 
+        setError,
+        clearErrors,
+        formState: { errors },
+        reset 
+    } = useForm({
+        defaultValues: {
+            doctor_id: "",
+            patient_id: "",
+            appointment_date: "",
+            appointment_time: "",
+        }
     });
 
     const [doctors, setDoctors] = useState([]);
     const [patients, setPatients] = useState([]);
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(isEditMode);
 
     useEffect(() => {
@@ -61,7 +73,7 @@ export default function AppointmentForm() {
                     ? new Date(response.data.appointment_date * 1000)
                     : new Date(response.data.appointment_date);
 
-                setForm({
+                reset({
                     doctor_id: response.data.doctor_id.toString(),
                     patient_id: response.data.patient_id.toString(),
                     appointment_date: appointmentDate.toISOString().split('T')[0],
@@ -70,7 +82,7 @@ export default function AppointmentForm() {
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching appointment:", error);
-                setError("Failed to load appointment data.");
+                toast.error("Failed to load appointment data.");
                 setLoading(false);
             }
         };
@@ -78,27 +90,19 @@ export default function AppointmentForm() {
         fetchAppointment();
     }, [id, isEditMode]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-        
+    const onSubmit = async (data) => {
         const token = localStorage.getItem('token');
         if (!token) {
-            setError("No authentication token found. Please log in.");
-            return;
-        }
-        
-        if (!form.doctor_id || !form.patient_id || !form.appointment_date || !form.appointment_time) {
-            setError("Please fill in all required fields");
+            toast.error("No authentication token found. Please log in.");
             return;
         }
 
         // Combine date and time into ISO string
-        const dateTimeString = `${form.appointment_date}T${form.appointment_time}:00`;
+        const dateTimeString = `${data.appointment_date}T${data.appointment_time}:00`;
         
         const appointmentData = {
-            doctor_id: parseInt(form.doctor_id),
-            patient_id: parseInt(form.patient_id),
+            doctor_id: parseInt(data.doctor_id),
+            patient_id: parseInt(data.patient_id),
             appointment_date: dateTimeString,
         };
         
@@ -128,31 +132,38 @@ export default function AppointmentForm() {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} appointment:`, error);
             console.error("Full error:", JSON.stringify(error.response?.data, null, 2));
             
-            let errorMessage = '';
             const errorData = error.response?.data;
             
-            if (errorData?.issues) {
-                try {
-                    const issues = JSON.parse(JSON.stringify(errorData.issues));
-                    const messages = issues.map(issue => {
-                        const path = issue.path ? issue.path.join('.') : 'field';
-                        return `${path}: ${issue.message}`;
-                    }).join('; ');
-                    errorMessage = messages;
-                } catch (e) {
-                    errorMessage = "Validation error - check console for details";
-                }
-            } else if (errorData?.error) {
-                errorMessage = typeof errorData.error === 'string' ? errorData.error : JSON.stringify(errorData.error);
-            } else if (errorData?.message) {
-                errorMessage = errorData.message;
-            } else if (error.response?.status === 401) {
-                errorMessage = "Authentication failed. Please log in again.";
-            } else {
-                errorMessage = `Failed to ${isEditMode ? 'update' : 'create'} appointment.`;
-            }
+            // Clear any existing errors first
+            clearErrors();
             
-            setError(errorMessage);
+            if (errorData?.issues) {
+                // Parse validation errors and set them on specific fields
+                errorData.issues.forEach(issue => {
+                    const fieldPath = issue.path && issue.path.length > 0 ? issue.path[0] : null;
+                    if (fieldPath) {
+                        // Map appointment_date to both date and time fields if needed
+                        if (fieldPath === 'appointment_date') {
+                            setError('appointment_date', {
+                                type: 'server',
+                                message: issue.message
+                            });
+                        } else {
+                            setError(fieldPath, {
+                                type: 'server',
+                                message: issue.message
+                            });
+                        }
+                    } else {
+                        toast.error(issue.message || 'Validation error occurred');
+                    }
+                });
+            } else if (error.response?.status === 401) {
+                toast.error("Authentication failed. Please log in again.");
+            } else {
+                const message = errorData?.message || errorData?.error || `Failed to ${isEditMode ? 'update' : 'create'} appointment.`;
+                toast.error(message);
+            }
         }
     }
 
@@ -164,17 +175,14 @@ export default function AppointmentForm() {
         <div>
             <h1 className="mb-4">{isEditMode ? 'Edit' : 'Create'} Appointment</h1>
             
-            {error && (
-                <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded max-w-md">
-                    {error}
-                </div>
-            )}
-            
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-2 max-w-md">
                     <Select 
-                        onValueChange={(value) => setForm({ ...form, doctor_id: value })} 
-                        value={form.doctor_id}
+                        onValueChange={(value) => {
+                            setValue('doctor_id', value);
+                            clearErrors('doctor_id');
+                        }}
+                        value={watch('doctor_id')}
                     >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Doctor" />
@@ -187,10 +195,18 @@ export default function AppointmentForm() {
                             ))}
                         </SelectContent>
                     </Select>
+                    <input 
+                        type="hidden" 
+                        {...register('doctor_id', { required: 'Doctor is required' })}
+                    />
+                    {errors.doctor_id && <p className="text-red-500 text-sm mt-1">{errors.doctor_id.message}</p>}
 
                     <Select 
-                        onValueChange={(value) => setForm({ ...form, patient_id: value })} 
-                        value={form.patient_id}
+                        onValueChange={(value) => {
+                            setValue('patient_id', value);
+                            clearErrors('patient_id');
+                        }}
+                        value={watch('patient_id')}
                     >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Patient" />
@@ -203,20 +219,44 @@ export default function AppointmentForm() {
                             ))}
                         </SelectContent>
                     </Select>
+                    <input 
+                        type="hidden" 
+                        {...register('patient_id', { required: 'Patient is required' })}
+                    />
+                    {errors.patient_id && <p className="text-red-500 text-sm mt-1">{errors.patient_id.message}</p>}
 
                     <DatePicker
-                        value={form.appointment_date}
-                        onChange={(date) => setForm({ ...form, appointment_date: date })}
+                        value={watch('appointment_date')}
+                        onChange={(date) => {
+                            setValue('appointment_date', date, { shouldValidate: true });
+                            clearErrors('appointment_date');
+                        }}
                         placeholder="Select appointment date"
                     />
+                    <input 
+                        type="hidden" 
+                        {...register('appointment_date', { 
+                            required: 'Appointment date is required',
+                            validate: (value) => {
+                                if (!value || value === '' || value === null || value === undefined) {
+                                    return 'Appointment date is required';
+                                }
+                                const date = new Date(value);
+                                if (isNaN(date.getTime())) {
+                                    return 'Please select a valid date';
+                                }
+                                return true;
+                            }
+                        })}
+                    />
+                    {errors.appointment_date && <p className="text-red-500 text-sm mt-1">{errors.appointment_date.message}</p>}
 
                     <Input
                         type="time"
-                        value={form.appointment_time}
-                        onChange={(e) => setForm({ ...form, appointment_time: e.target.value })}
+                        {...register('appointment_time', { required: 'Appointment time is required' })}
                         placeholder="Appointment Time"
-                        required
                     />
+                    {errors.appointment_time && <p className="text-red-500 text-sm mt-1">{errors.appointment_time.message}</p>}
                     
                     <Button type="submit">{isEditMode ? 'Update' : 'Create'} Appointment</Button>
                 </div>

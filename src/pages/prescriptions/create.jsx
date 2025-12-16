@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Label } from "@/components/ui/label";
 import axios from "@/config/api.js";
 import { toast } from "sonner";
 
@@ -12,20 +14,30 @@ export default function PrescriptionForm() {
     const { id } = useParams();
     const isEditMode = !!id;
 
-    const [form, setForm] = useState({
-        patient_id: "",
-        doctor_id: "",
-        diagnosis_id: "",
-        medication: "",
-        dosage: "",
-        start_date: "",
-        end_date: "",
+    const { 
+        register, 
+        handleSubmit, 
+        setValue, 
+        watch, 
+        setError,
+        clearErrors,
+        formState: { errors },
+        reset 
+    } = useForm({
+        defaultValues: {
+            patient_id: "",
+            doctor_id: "",
+            diagnosis_id: "",
+            medication: "",
+            dosage: "",
+            start_date: "",
+            end_date: "",
+        }
     });
 
     const [patients, setPatients] = useState([]);
     const [doctors, setDoctors] = useState([]);
     const [diagnoses, setDiagnoses] = useState([]);
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(isEditMode);
 
     useEffect(() => {
@@ -60,7 +72,7 @@ export default function PrescriptionForm() {
         const fetchPrescription = async () => {
             const token = localStorage.getItem('token');
             if (!token) {
-                setError("No authentication token found. Please log in.");
+                toast.error("No authentication token found. Please log in.");
                 setLoading(false);
                 return;
             }
@@ -80,7 +92,7 @@ export default function PrescriptionForm() {
                         : new Date(response.data.end_date).toISOString().split('T')[0])
                     : "";
 
-                setForm({
+                reset({
                     patient_id: response.data.patient_id.toString(),
                     doctor_id: response.data.doctor_id.toString(),
                     diagnosis_id: response.data.diagnosis_id ? response.data.diagnosis_id.toString() : "",
@@ -92,7 +104,7 @@ export default function PrescriptionForm() {
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching prescription:", error);
-                setError("Failed to load prescription data.");
+                toast.error("Failed to load prescription data.");
                 setLoading(false);
             }
         };
@@ -100,42 +112,29 @@ export default function PrescriptionForm() {
         fetchPrescription();
     }, [id, isEditMode]);
 
-    const handleChange = (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
-        });
-    }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-        
+
+    const onSubmit = async (data) => {
         const token = localStorage.getItem('token');
         if (!token) {
-            setError("No authentication token found. Please log in.");
-            return;
-        }
-        
-        if (!form.patient_id || !form.doctor_id || !form.medication || !form.dosage || !form.start_date) {
-            setError("Please fill in all required fields");
+            toast.error("No authentication token found. Please log in.");
             return;
         }
 
         const prescriptionData = {
-            patient_id: parseInt(form.patient_id),
-            doctor_id: parseInt(form.doctor_id),
-            medication: form.medication,
-            dosage: form.dosage,
-            start_date: form.start_date,
+            patient_id: parseInt(data.patient_id),
+            doctor_id: parseInt(data.doctor_id),
+            medication: data.medication,
+            dosage: data.dosage,
+            start_date: data.start_date,
         };
 
-        if (form.diagnosis_id) {
-            prescriptionData.diagnosis_id = parseInt(form.diagnosis_id);
+        if (data.diagnosis_id) {
+            prescriptionData.diagnosis_id = parseInt(data.diagnosis_id);
         }
 
-        if (form.end_date) {
-            prescriptionData.end_date = form.end_date;
+        if (data.end_date) {
+            prescriptionData.end_date = data.end_date;
         }
         
         console.log('Sending prescription data:', prescriptionData);
@@ -162,33 +161,39 @@ export default function PrescriptionForm() {
             
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} prescription:`, error);
-            console.error("Full error:", JSON.stringify(error.response?.data, null, 2));
             
-            let errorMessage = '';
             const errorData = error.response?.data;
             
-            if (errorData?.issues) {
-                try {
-                    const issues = JSON.parse(JSON.stringify(errorData.issues));
-                    const messages = issues.map(issue => {
-                        const path = issue.path ? issue.path.join('.') : 'field';
-                        return `${path}: ${issue.message}`;
-                    }).join('; ');
-                    errorMessage = messages;
-                } catch (e) {
-                    errorMessage = "Validation error - check console for details";
-                }
-            } else if (errorData?.error) {
-                errorMessage = typeof errorData.error === 'string' ? errorData.error : JSON.stringify(errorData.error);
-            } else if (errorData?.message) {
-                errorMessage = errorData.message;
-            } else if (error.response?.status === 401) {
-                errorMessage = "Authentication failed. Please log in again.";
-            } else {
-                errorMessage = `Failed to ${isEditMode ? 'update' : 'create'} prescription.`;
-            }
+            // Clear any existing errors first
+            clearErrors();
             
-            setError(errorMessage);
+            if (errorData?.issues) {
+                // Parse validation errors and set them on specific fields
+                errorData.issues.forEach(issue => {
+                    const fieldPath = issue.path && issue.path.length > 0 ? issue.path[0] : null;
+                    if (fieldPath) {
+                        // Map common API field names to form field names
+                        let mappedField = fieldPath;
+                        if (fieldPath === 'start_date' || fieldPath === 'end_date') {
+                            mappedField = fieldPath; // Keep the same for date fields
+                        }
+                        
+                        setError(mappedField, {
+                            type: 'server',
+                            message: issue.message
+                        });
+                    } else {
+                        // For errors without a specific path, show a general toast
+                        toast.error(issue.message || 'Validation error occurred');
+                    }
+                });
+            } else if (error.response?.status === 401) {
+                toast.error("Authentication failed. Please log in again.");
+            } else {
+                // For other errors, show a general toast
+                const message = errorData?.message || errorData?.error || `Failed to ${isEditMode ? 'update' : 'create'} prescription.`;
+                toast.error(message);
+            }
         }
     }
 
@@ -200,89 +205,122 @@ export default function PrescriptionForm() {
         <div>
             <h1 className="mb-4">{isEditMode ? 'Edit' : 'Create'} Prescription</h1>
             
-            {error && (
-                <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded max-w-md">
-                    {error}
-                </div>
-            )}
-            
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-2 max-w-md">
                     <Select 
-                        onValueChange={(value) => setForm({ ...form, patient_id: value })} 
-                        value={form.patient_id}
-                    >
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Patient" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {patients.map(patient => (
-                                <SelectItem key={patient.id} value={patient.id.toString()}>
-                                    {patient.first_name} {patient.last_name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                            onValueChange={(value) => {
+                                setValue('patient_id', value);
+                                clearErrors('patient_id');
+                            }}
+                            value={watch('patient_id')}
+                            required
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Patient" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {patients.map(patient => (
+                                    <SelectItem key={patient.id} value={patient.id.toString()}>
+                                        {patient.first_name} {patient.last_name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <input 
+                            type="hidden" 
+                            {...register('patient_id', { required: 'Patient is required' })}
+                        />
+                    {errors.patient_id && <p className="text-red-500 text-sm mt-1">{errors.patient_id.message}</p>}
 
                     <Select 
-                        onValueChange={(value) => setForm({ ...form, doctor_id: value })} 
-                        value={form.doctor_id}
+                        onValueChange={(value) => {
+                            setValue('doctor_id', value);
+                            clearErrors('doctor_id');
+                        }}
+                        value={watch('doctor_id')}
                     >
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Doctor" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {doctors.map(doctor => (
-                                <SelectItem key={doctor.id} value={doctor.id.toString()}>
-                                    Dr. {doctor.first_name} {doctor.last_name} - {doctor.specialisation}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Doctor" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {doctors.map(doctor => (
+                                    <SelectItem key={doctor.id} value={doctor.id.toString()}>
+                                        Dr. {doctor.first_name} {doctor.last_name} - {doctor.specialisation}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <input 
+                            type="hidden" 
+                            {...register('doctor_id', { required: 'Doctor is required' })}
+                        />
+                    {errors.doctor_id && <p className="text-red-500 text-sm mt-1">{errors.doctor_id.message}</p>}
 
                     <Select 
-                        onValueChange={(value) => setForm({ ...form, diagnosis_id: value })} 
-                        value={form.diagnosis_id}
-                    >
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Diagnosis (Optional)" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {diagnoses.map(diagnosis => (
-                                <SelectItem key={diagnosis.id} value={diagnosis.id.toString()}>
-                                    {diagnosis.condition} (ID: {diagnosis.id})
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                            onValueChange={(value) => setValue('diagnosis_id', value)}
+                            value={watch('diagnosis_id')}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Diagnosis (Optional)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {diagnoses.map(diagnosis => (
+                                    <SelectItem key={diagnosis.id} value={diagnosis.id.toString()}>
+                                        {diagnosis.condition} (ID: {diagnosis.id})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>                        <input 
+                            type="hidden" 
+                            {...register('patient_id', { required: 'Patient is required' })}
+                        />                    {errors.diagnosis_id && <p className="text-red-500 text-sm mt-1">{errors.diagnosis_id.message}</p>}
 
                     <Input 
-                        name="medication"
+                        {...register('medication', { required: 'Medication name is required' })}
                         placeholder="Medication Name"
-                        value={form.medication}
-                        onChange={handleChange}
-                        required
                     />
+                    {errors.medication && <p className="text-red-500 text-sm mt-1">{errors.medication.message}</p>}
 
                     <Input 
-                        name="dosage"
+                        {...register('dosage', { required: 'Dosage is required' })}
                         placeholder="Dosage (e.g., 500mg twice daily)"
-                        value={form.dosage}
-                        onChange={handleChange}
-                        required
                     />
+                    {errors.dosage && <p className="text-red-500 text-sm mt-1">{errors.dosage.message}</p>}
+
+                    
+                        <DatePicker
+                            value={watch('start_date')}
+                            onChange={(date) => {
+                                setValue('start_date', date, { shouldValidate: true });
+                                clearErrors('start_date');
+                            }}
+                            placeholder="Select start date"
+                        />
+                        <input 
+                            type="hidden" 
+                            {...register('start_date', { 
+                                required: 'Start date is required',
+                                validate: (value) => {
+                                    if (!value || value === '' || value === null || value === undefined) {
+                                        return 'Start date is required';
+                                    }
+                                    // Check if date is valid
+                                    const date = new Date(value);
+                                    if (isNaN(date.getTime())) {
+                                        return 'Please select a valid date';
+                                    }
+                                    return true;
+                                }
+                            })}
+                        />
+                    {errors.start_date && <p className="text-red-500 text-sm mt-1">{errors.start_date.message}</p>}
 
                     <DatePicker
-                        value={form.start_date}
-                        onChange={(date) => setForm({ ...form, start_date: date })}
-                        placeholder="Select start date"
-                    />
-
-                    <DatePicker
-                        value={form.end_date}
-                        onChange={(date) => setForm({ ...form, end_date: date })}
+                        value={watch('end_date')}
+                        onChange={(date) => setValue('end_date', date)}
                         placeholder="Select end date (Optional)"
                     />
+                    {errors.end_date && <p className="text-red-500 text-sm mt-1">{errors.end_date.message}</p>}
                     
                     <Button type="submit">{isEditMode ? 'Update' : 'Create'} Prescription</Button>
                 </div>
