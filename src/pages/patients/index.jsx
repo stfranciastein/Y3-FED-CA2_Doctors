@@ -29,22 +29,22 @@ export default function PatientsIndex() {
   const [response, setResponse] = useState([]);
   const { viewMode, toggleViewMode } = useViewMode('patientsViewMode');
 
+  const fetchPatients = async () => {
+      const options = {
+          method: 'GET',
+          url: '/patients',
+      };
+
+      try {
+          let response = await axios.request(options);
+          console.log(response.data);
+          setResponse(response.data);
+      } catch (err) {
+          console.log(err);
+      }
+  };
+
   useEffect(() => {
-    const fetchPatients = async () => {
-        const options = {
-            method: 'GET',
-            url: '/patients',
-        };
-
-        try {
-            let response = await axios.request(options);
-            console.log(response.data);
-            setResponse(response.data);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
     fetchPatients();
   }, []);
 
@@ -106,7 +106,7 @@ export default function PatientsIndex() {
                                 <Button asChild variant='outline' size="sm">
                                     <Link to={`/patients/${patient.id}/edit`}><Pencil size={18} className="mr-1" /> Edit</Link>
                                 </Button>
-                                <DeleteBtn resource="patients" id={patient.id} />
+                                <DeleteBtn resource="patients" id={patient.id} itemName={`${patient.first_name} ${patient.last_name}`} onDeleteSuccess={fetchPatients} />
                             </CardFooter>
                         </Card>
                     ))}
@@ -149,7 +149,7 @@ export default function PatientsIndex() {
                                     <Button asChild variant="outline" size="sm">
                                         <Link to={`/patients/${patient.id}/edit`}><Pencil size={18} /></Link>
                                     </Button>
-                                    <DeleteBtn resource="patients" id={patient.id} />
+                                    <DeleteBtn resource="patients" id={patient.id} itemName={`${patient.first_name} ${patient.last_name}`} onDeleteSuccess={fetchPatients} />
                                     </div>
                                 </TableCell>
                             </TableRow>

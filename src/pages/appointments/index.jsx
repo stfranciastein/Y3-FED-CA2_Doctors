@@ -31,44 +31,44 @@ export default function AppointmentsIndex() {
   const [patients, setPatients] = useState({});
   const { viewMode, toggleViewMode } = useViewMode('appointmentsViewMode');
 
+  const fetchAppointments = async () => {
+      const token = localStorage.getItem('token');
+      const options = {
+          method: 'GET',
+          url: '/appointments',
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      };
+
+      try {
+          let response = await axios.request(options);
+          console.log(response.data);
+          setResponse(response.data);
+
+          // Fetch all doctors and patients
+          const [doctorsRes, patientsRes] = await Promise.all([
+              axios.get('/doctors'),
+              axios.get('/patients')
+          ]);
+
+          const doctorsMap = {};
+          doctorsRes.data.forEach(doc => {
+              doctorsMap[doc.id] = doc;
+          });
+          setDoctors(doctorsMap);
+
+          const patientsMap = {};
+          patientsRes.data.forEach(pat => {
+              patientsMap[pat.id] = pat;
+          });
+          setPatients(patientsMap);
+      } catch (err) {
+          console.log(err);
+      }
+  };
+
   useEffect(() => {
-    const fetchAppointments = async () => {
-        const token = localStorage.getItem('token');
-        const options = {
-            method: 'GET',
-            url: '/appointments',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        };
-
-        try {
-            let response = await axios.request(options);
-            console.log(response.data);
-            setResponse(response.data);
-
-            // Fetch all doctors and patients
-            const [doctorsRes, patientsRes] = await Promise.all([
-                axios.get('/doctors'),
-                axios.get('/patients')
-            ]);
-
-            const doctorsMap = {};
-            doctorsRes.data.forEach(doc => {
-                doctorsMap[doc.id] = doc;
-            });
-            setDoctors(doctorsMap);
-
-            const patientsMap = {};
-            patientsRes.data.forEach(pat => {
-                patientsMap[pat.id] = pat;
-            });
-            setPatients(patientsMap);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
     fetchAppointments();
   }, []);
 
@@ -140,7 +140,7 @@ export default function AppointmentsIndex() {
                                 <Button asChild variant='outline' size="sm">
                                     <Link to={`/appointments/${appointment.id}/edit`}><Pencil size={18} className="mr-1" /> Edit</Link>
                                 </Button>
-                                <DeleteBtn resource="appointments" id={appointment.id} />
+                                <DeleteBtn resource="appointments" id={appointment.id} itemName={`#${appointment.id}`} onDeleteSuccess={fetchAppointments} />
                             </CardFooter>
                         </Card>
                     ))}
@@ -179,7 +179,7 @@ export default function AppointmentsIndex() {
                                     <Button asChild variant="outline" size="sm">
                                         <Link to={`/appointments/${appointment.id}/edit`}><Pencil size={18} /></Link>
                                     </Button>
-                                    <DeleteBtn resource="appointments" id={appointment.id} />
+                                    <DeleteBtn resource="appointments" id={appointment.id} itemName={`#${appointment.id}`} onDeleteSuccess={fetchAppointments} />
                                     </div>
                                 </TableCell>
                             </TableRow>

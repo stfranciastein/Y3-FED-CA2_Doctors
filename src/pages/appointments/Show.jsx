@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router';
 import axios from '@/config/api.js';
 import { Button } from '@/components/ui/button';
 import { Pencil } from 'lucide-react';
+import DeleteBtn from '@/components/DeleteBtn';
 
 export default function AppointmentPage() {
   const [response, setResponse] = useState(null);
@@ -56,12 +57,15 @@ export default function AppointmentPage() {
         <div>
           <div className="flex justify-between items-start mb-6">
             <h1 className="text-3xl font-bold">Appointment #{response.id}</h1>
-            <Button asChild variant="outline" size="sm">
-              <Link to={`/appointments/${id}/edit`}>
-                <Pencil size={18} className="mr-2" />
-                Edit
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild variant="outline" size="sm">
+                <Link to={`/appointments/${id}/edit`}>
+                  <Pencil size={18} className="mr-2" />
+                  Edit
+                </Link>
+              </Button>
+              <DeleteBtn resource="appointments" id={id} itemName={`#${response.id}`} />
+            </div>
           </div>
           
           <div className="space-y-4">

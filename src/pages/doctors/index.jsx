@@ -32,22 +32,22 @@ export default function DoctorsIndex() {
   const [response, setResponse] = useState([]);
   const { viewMode, toggleViewMode } = useViewMode('doctorsViewMode');
 
+  const fetchDoctors = async () => {
+      const options = {
+          method: 'GET',
+          url: '/doctors',
+      };
+
+      try {
+          let response = await axios.request(options); //It's more common to use async/await syntax now instead of .then() syntax
+          console.log(response.data);
+          setResponse(response.data);
+      } catch (err) {
+          console.log(err);
+      }
+  };
+
   useEffect(() => {
-    const fetchDoctors = async () => {
-        const options = {
-            method: 'GET',
-            url: '/doctors',
-        };
-
-        try {
-            let response = await axios.request(options); //It's more common to use async/await syntax now instead of .then() syntax
-            console.log(response.data);
-            setResponse(response.data);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
     fetchDoctors();
     //.catch(() => console.log("Hello World"));
   }, []);
@@ -154,7 +154,7 @@ export default function DoctorsIndex() {
                                 <Button asChild variant='outline' size="sm">
                                     <Link to={`/doctors/${doctor.id}/edit`}><Pencil size={18} className="mr-1" /> Edit</Link>
                                 </Button>
-                                <DeleteBtn resource="doctors" id={doctor.id} />
+                                <DeleteBtn resource="doctors" id={doctor.id} itemName={`Dr. ${doctor.first_name} ${doctor.last_name}`} onDeleteSuccess={fetchDoctors} />
                             </CardFooter>
                         </Card>
                     ))}
@@ -189,7 +189,7 @@ export default function DoctorsIndex() {
                                     <Button asChild variant="outline" size="sm">
                                         <Link to={`/doctors/${doctor.id}/edit`}><Pencil size={18} /></Link>
                                     </Button>
-                                    <DeleteBtn resource="doctors" id={doctor.id} />
+                                    <DeleteBtn resource="doctors" id={doctor.id} itemName={`Dr. ${doctor.first_name} ${doctor.last_name}`} onDeleteSuccess={fetchDoctors} />
                                     </div>
                                 </TableCell>
                             </TableRow>

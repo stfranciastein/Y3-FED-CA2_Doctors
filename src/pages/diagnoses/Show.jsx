@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import axios from '@/config/api.js';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil } from 'lucide-react';
+import DeleteBtn from '@/components/DeleteBtn';
 
 export default function DiagnosisPage() {
   const [response, setResponse] = useState(null);
@@ -55,12 +56,7 @@ export default function DiagnosisPage() {
                   Edit
                 </Link>
               </Button>
-              <Button asChild variant="destructive" size="sm">
-                <Link to={`/diagnoses/${id}/delete`}>
-                  <Trash2 size={18} className="mr-2" />
-                  Delete
-                </Link>
-              </Button>
+              <DeleteBtn resource="diagnoses" id={id} itemName={`#${response.id}`} />
             </div>
           </div>
           

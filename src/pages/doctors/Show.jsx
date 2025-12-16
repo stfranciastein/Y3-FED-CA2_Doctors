@@ -4,6 +4,7 @@ import axios from '@/config/api.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pencil } from 'lucide-react';
+import DeleteBtn from '@/components/DeleteBtn';
 
 export default function DoctorPage() {
   const [response, setResponse] = useState(null);
@@ -49,12 +50,15 @@ export default function DoctorPage() {
         <div>
           <div className="flex justify-between items-start mb-6">
             <h1 className="text-3xl font-bold">{response.first_name} {response.last_name}</h1>
-            <Button asChild variant="outline" size="sm">
-              <Link to={`/doctors/${id}/edit`}>
-                <Pencil size={18} className="mr-2" />
-                Edit
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild variant="outline" size="sm">
+                <Link to={`/doctors/${id}/edit`}>
+                  <Pencil size={18} className="mr-2" />
+                  Edit
+                </Link>
+              </Button>
+              <DeleteBtn resource="doctors" id={id} itemName={`Dr. ${response.first_name} ${response.last_name}`} />
+            </div>
           </div>
           
           <Card>

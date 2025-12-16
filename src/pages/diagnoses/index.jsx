@@ -30,34 +30,34 @@ export default function DiagnosesIndex() {
   const [patients, setPatients] = useState({});
   const { viewMode, toggleViewMode } = useViewMode('diagnosesViewMode');
 
+  const fetchDiagnoses = async () => {
+      const token = localStorage.getItem('token');
+      const options = {
+          method: 'GET',
+          url: '/diagnoses',
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      };
+
+      try {
+          let response = await axios.request(options);
+          console.log(response.data);
+          setResponse(response.data);
+
+          // Fetch all patients to show patient details
+          const patientsRes = await axios.get('/patients');
+          const patientsMap = {};
+          patientsRes.data.forEach(pat => {
+              patientsMap[pat.id] = pat;
+          });
+          setPatients(patientsMap);
+      } catch (err) {
+          console.log(err);
+      }
+  };
+
   useEffect(() => {
-    const fetchDiagnoses = async () => {
-        const token = localStorage.getItem('token');
-        const options = {
-            method: 'GET',
-            url: '/diagnoses',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        };
-
-        try {
-            let response = await axios.request(options);
-            console.log(response.data);
-            setResponse(response.data);
-
-            // Fetch all patients to show patient details
-            const patientsRes = await axios.get('/patients');
-            const patientsMap = {};
-            patientsRes.data.forEach(pat => {
-                patientsMap[pat.id] = pat;
-            });
-            setPatients(patientsMap);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
     fetchDiagnoses();
   }, []);
 
@@ -128,7 +128,7 @@ export default function DiagnosesIndex() {
                                 <Button asChild variant='outline' size="sm">
                                     <Link to={`/diagnoses/${diagnosis.id}/edit`}><Pencil size={18} className="mr-1" /> Edit</Link>
                                 </Button>
-                                <DeleteBtn resource="diagnoses" id={diagnosis.id} />
+                                <DeleteBtn resource="diagnoses" id={diagnosis.id} itemName={`#${diagnosis.id}`} onDeleteSuccess={fetchDiagnoses} />
                             </CardFooter>
                         </Card>
                     )})}
@@ -167,7 +167,7 @@ export default function DiagnosesIndex() {
                                     <Button asChild variant="outline" size="sm">
                                         <Link to={`/diagnoses/${diagnosis.id}/edit`}><Pencil size={18} /></Link>
                                     </Button>
-                                    <DeleteBtn resource="diagnoses" id={diagnosis.id} />
+                                    <DeleteBtn resource="diagnoses" id={diagnosis.id} itemName={`#${diagnosis.id}`} onDeleteSuccess={fetchDiagnoses} />
                                     </div>
                                 </TableCell>
                             </TableRow>
