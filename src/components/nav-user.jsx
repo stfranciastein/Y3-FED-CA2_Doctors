@@ -5,10 +5,13 @@ import {
   IconLogout,
   IconNotification,
   IconUserCircle,
+  IconMoon,
+  IconSun,
 } from "@tabler/icons-react"
 
 import { useNavigate } from "react-router"
 import { useAuth } from "@/hooks/useAuth"
+import { useDarkMode } from "@/hooks/useDarkMode"
 
 import {
   Avatar,
@@ -36,6 +39,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const { onLogout } = useAuth()
+  const { isDarkMode, toggleDarkMode } = useDarkMode()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -89,6 +93,10 @@ export function NavUser({
             {isLoggedIn ? (
               <>
                 <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={toggleDarkMode}>
+                    {isDarkMode ? <IconSun /> : <IconMoon />}
+                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                  </DropdownMenuItem>
                   <DropdownMenuItem>
                     <IconUserCircle />
                     Account

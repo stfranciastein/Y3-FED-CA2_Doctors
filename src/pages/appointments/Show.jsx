@@ -51,7 +51,7 @@ export default function AppointmentPage() {
   };
   
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       {response && (
         <div>
           <div className="flex justify-between items-start mb-6">

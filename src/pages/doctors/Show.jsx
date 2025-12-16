@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import axios from '@/config/api.js';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pencil } from 'lucide-react';
 
 export default function DoctorPage() {
@@ -43,7 +44,7 @@ export default function DoctorPage() {
   };
   
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       {response && (
         <div>
           <div className="flex justify-between items-start mb-6">
@@ -56,38 +57,45 @@ export default function DoctorPage() {
             </Button>
           </div>
           
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase">ID</h3>
-                <p className="mt-1 text-lg">{response.id}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase">Specialisation</h3>
-                <p className="mt-1 text-lg">{response.specialisation}</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase">Email</h3>
-                <p className="mt-1 text-lg">{response.email}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase">Phone</h3>
-                <p className="mt-1 text-lg">{response.phone}</p>
-              </div>
-            </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Doctor Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase">ID</h3>
+                    <p className="mt-1 text-lg">{response.id}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase">Specialisation</h3>
+                    <p className="mt-1 text-lg">{response.specialisation}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase">Email</h3>
+                    <p className="mt-1 text-lg">{response.email}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase">Phone</h3>
+                    <p className="mt-1 text-lg">{response.phone}</p>
+                  </div>
+                </div>
 
-            {response.appointments && response.appointments.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase">Appointments</h3>
-                <p className="mt-1 text-lg">{response.appointments.length} appointment(s)</p>
+                {response.appointments && response.appointments.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase">Appointments</h3>
+                    <p className="mt-1 text-lg">{response.appointments.length} appointment(s)</p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

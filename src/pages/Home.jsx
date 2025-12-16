@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '@/hooks/useAuth';
+import { useDarkMode } from '@/hooks/useDarkMode';
 import LoginForm from '@/components/LoginForm.jsx';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
@@ -23,6 +24,7 @@ const signupSchema = z.object({
 
 export default function Home() {
     const { token } = useAuth();
+    const { isDarkMode } = useDarkMode();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [showLogo, setShowLogo] = useState(false);
@@ -91,7 +93,7 @@ export default function Home() {
     // Loading screen
     if (isLoading) {
         return (
-            <div className="fixed inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-teal-900 flex items-center justify-center">
+            <div className={`fixed inset-0 flex items-center justify-center ${isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-teal-600 via-teal-700 to-teal-900'}`}>
                 <div className="relative">
                     <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin" />
                 </div>
@@ -100,12 +102,12 @@ export default function Home() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-teal-600 via-teal-700 to-teal-900 flex items-center justify-center p-4">
+        <div className={`min-h-screen flex items-center justify-center p-4 ${isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-teal-600 via-teal-700 to-teal-900'}`}>
             <div className={`w-full max-w-md transition-all duration-1000 ${showLogo ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 {/* Logo Section */}
                 <div className="text-center mb-8 space-y-6">
-                    <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full shadow-2xl">
-                        <Stethoscope className="w-12 h-12 text-teal-600" />
+                    <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full shadow-2xl ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
+                        <Stethoscope className={`w-12 h-12 ${isDarkMode ? 'text-teal-400' : 'text-teal-600'}`} />
                     </div>
                     <h1 className="text-4xl font-bold text-white">IADT Medical</h1>
                 </div>
@@ -115,10 +117,10 @@ export default function Home() {
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <Tabs defaultValue="login" className="w-full">
                             <TabsList className="grid w-full grid-cols-2 bg-transparent border-none">
-                                <TabsTrigger value="login" className="bg-teal-800/60 text-white data-[state=active]:bg-white data-[state=active]:text-teal-600 transition-all duration-300 ease-in-out">
+                                <TabsTrigger value="login" className={`transition-all duration-300 ease-in-out ${isDarkMode ? 'bg-slate-700/60 text-white data-[state=active]:bg-slate-800 data-[state=active]:text-teal-400' : 'bg-teal-800/60 text-white data-[state=active]:bg-white data-[state=active]:text-teal-600'}`}>
                                     Login
                                 </TabsTrigger>
-                                <TabsTrigger value="signup" className="bg-teal-800/60 text-white data-[state=active]:bg-white data-[state=active]:text-teal-600 transition-all duration-300 ease-in-out">
+                                <TabsTrigger value="signup" className={`transition-all duration-300 ease-in-out ${isDarkMode ? 'bg-slate-700/60 text-white data-[state=active]:bg-slate-800 data-[state=active]:text-teal-400' : 'bg-teal-800/60 text-white data-[state=active]:bg-white data-[state=active]:text-teal-600'}`}>
                                     Sign Up
                                 </TabsTrigger>
                             </TabsList>
@@ -128,7 +130,7 @@ export default function Home() {
                             </TabsContent>
 
                             <TabsContent value="signup">
-                                <Card className="w-full bg-white/95 backdrop-blur border-white/20">
+                                <Card className={`w-full backdrop-blur ${isDarkMode ? 'bg-slate-800/95 border-slate-700' : 'bg-white/95 border-white/20'}`}>
                                     <CardHeader>
                                         <CardTitle>Create an account</CardTitle>
                                         <CardDescription>
@@ -196,7 +198,7 @@ export default function Home() {
                                         <Button 
                                             onClick={handleSubmit(submitSignup)} 
                                             type="submit" 
-                                            className="w-full bg-teal-600 hover:bg-teal-700"
+                                            className={`w-full ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600' : 'bg-teal-600 hover:bg-teal-700'}`}
                                             disabled={isSubmitting}
                                         >
                                             {isSubmitting ? 'Signing Up...' : 'Sign Up'}

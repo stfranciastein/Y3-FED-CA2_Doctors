@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "@/hooks/useAuth";
+import { useDarkMode } from "@/hooks/useDarkMode";
 
 // Imported from the card page on the ShadCN docs
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ const loginSchema = z.object({
 
 export default function LoginForm() {
   const { onLogin } = useAuth();
+  const { isDarkMode } = useDarkMode();
   
   const {
     register,
@@ -50,7 +52,7 @@ export default function LoginForm() {
     <>
     {/* The purpose of this form is to allow users to log in to their accounts.
     In order to submit things to the API it expects a JSON which is what this submits. */}
-      <Card className="w-full bg-white/95 backdrop-blur border-white/20">
+      <Card className={`w-full backdrop-blur ${isDarkMode ? 'bg-slate-800/95 border-slate-700' : 'bg-white/95 border-white/20'}`}>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
@@ -100,7 +102,7 @@ export default function LoginForm() {
           <Button 
             onClick={handleSubmit(submitForm)} 
             type="submit" 
-            className="w-full bg-teal-600 hover:bg-teal-700"
+            className={`w-full ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600' : 'bg-teal-600 hover:bg-teal-700'}`}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Logging in...' : 'Login'}
