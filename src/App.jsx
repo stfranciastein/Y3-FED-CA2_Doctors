@@ -7,7 +7,8 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 
-import Navbar from '@/components/Navbar';
+// Not being used currently
+// import Navbar from '@/components/Navbar'; 
 import Home from '@/pages/Home';
 
 import DoctorsIndex from'@/pages/doctors/index.jsx';

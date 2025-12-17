@@ -26,12 +26,14 @@ export default function IndexToolbar({
 }) {
   return (
     <div className="flex gap-2 mb-4">
+      {/* Search Bar */}
       <SearchBar
         value={searchTerm}
         onChange={onSearchChange}
         placeholder={searchPlaceholder}
       />
 
+      {/* Add Resource Button */}
       <Button asChild variant='outline'>
         <Link to={addLink}>
           <Plus size={18} className="md:mr-2" />
@@ -39,6 +41,7 @@ export default function IndexToolbar({
         </Link>
       </Button>
       
+      {/* Sort Options */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -76,6 +79,7 @@ export default function IndexToolbar({
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* View Mode Toggle */}
       <Button
         variant='outline'
         onClick={onViewToggle}

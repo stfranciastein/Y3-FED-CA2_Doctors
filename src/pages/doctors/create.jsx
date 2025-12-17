@@ -20,6 +20,7 @@ export default function DoctorForm() {
     });
 
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState({});
     const [loading, setLoading] = useState(isEditMode);
 
     // Fetch existing doctor data if in edit mode
@@ -58,10 +59,35 @@ export default function DoctorForm() {
     }, [id, isEditMode]);
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
+        
         setForm({
             ...form,
-            [e.target.name]: e.target.value,
+            [name]: value,
         });
+
+        // Clear field error when user starts typing
+        if (fieldErrors[name]) {
+            setFieldErrors({
+                ...fieldErrors,
+                [name]: ""
+            });
+        }
+
+        // Validate phone number length
+        if (name === "phone" && value.length > 0) {
+            if (value.length > 10) {
+                setFieldErrors({
+                    ...fieldErrors,
+                    phone: "Phone number must be 10 digits or less"
+                });
+            } else if (!/^\d*$/.test(value)) {
+                setFieldErrors({
+                    ...fieldErrors,
+                    phone: "Phone number must contain only digits"
+                });
+            }
+        }
     }
 
     const handleSelectChange = (value) => {
@@ -74,6 +100,7 @@ export default function DoctorForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+        setFieldErrors({});
         
         const token = localStorage.getItem('token');
         if (!token) {
@@ -84,6 +111,19 @@ export default function DoctorForm() {
         // Validate required fields
         if (!form.first_name || !form.last_name || !form.email || !form.phone || !form.specialisation) {
             setError("Please fill in all required fields");
+            return;
+        }
+
+        // Validate phone number
+        if (form.phone.length > 10) {
+            setFieldErrors({ phone: "Phone number must be 10 digits or less" });
+            setError("Please fix the validation errors below");
+            return;
+        }
+
+        if (!/^\d+$/.test(form.phone)) {
+            setFieldErrors({ phone: "Phone number must contain only digits" });
+            setError("Please fix the validation errors below");
             return;
         }
 
@@ -171,14 +211,21 @@ export default function DoctorForm() {
                         onChange={handleChange} 
                         required 
                     />
-                    <Input 
-                        type="tel" 
-                        placeholder="Phone" 
-                        name="phone" 
-                        value={form.phone} 
-                        onChange={handleChange} 
-                        required 
-                    />
+                    <div>
+                        <Input 
+                            type="tel" 
+                            placeholder="Phone (max 10 digits)" 
+                            name="phone" 
+                            value={form.phone} 
+                            onChange={handleChange} 
+                            maxLength={10}
+                            className={fieldErrors.phone ? "border-red-500" : ""}
+                            required 
+                        />
+                        {fieldErrors.phone && (
+                            <p className="text-red-500 text-sm mt-1">{fieldErrors.phone}</p>
+                        )}
+                    </div>
                     <Select onValueChange={handleSelectChange} value={form.specialisation}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Specialisation" />
